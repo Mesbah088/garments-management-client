@@ -6,8 +6,8 @@ A next-generation enterprise apparel manufacturing, wholesale order management, 
 
 ## 🌐 Live URL & Repository Links
 - **Live Site**: `https://garments-tracker-app.web.app` (or your active deployment URL)
-- **Client GitHub Repository**: `https://github.com/your-username/garments-management-clinet`
-- **Server GitHub Repository**: `https://github.com/your-username/garments-management-server`
+- **Client GitHub Repository**: `https://github.com/Mesbah088/garments-management-client`
+- **Server GitHub Repository**: `https://github.com/Mesbah088/garments-management-server`
 
 ---
 
