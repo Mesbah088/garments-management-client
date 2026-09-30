@@ -15,6 +15,10 @@ import Contact from "../Component/Pages/Contact";
 import Login from "../Component/Pages/Login";
 import Register from "../Component/Pages/Register";
 
+// Dashboard Shared & Index
+import DashboardIndex from "../Component/Dashboard/DashboardIndex";
+import Profile from "../Component/Dashboard/Profile";
+
 // Dashboard Admin Pages
 import AdminDashboard from "../Component/Dashboard/Admin/AdminDashboard";
 import ManageUsers from "../Component/Dashboard/Admin/ManageUsers";
@@ -27,10 +31,9 @@ import ManageProducts from "../Component/Dashboard/Manager/ManageProducts";
 import PendingOrders from "../Component/Dashboard/Manager/PendingOrders";
 import ApprovedOrders from "../Component/Dashboard/Manager/ApprovedOrders";
 
-// Dashboard Buyer Pages & Profile
+// Dashboard Buyer Pages
 import MyOrders from "../Component/Dashboard/Buyer/MyOrders";
 import TrackOrder from "../Component/Dashboard/Buyer/TrackOrder";
-import Profile from "../Component/Dashboard/Profile";
 
 // Route Guards
 import PrivateRoute from "./PrivateRoute";
@@ -110,9 +113,15 @@ export const router = createBrowserRouter([
     ),
     errorElement: <ErrorPage />,
     children: [
-      // Admin Private Routes
+      // Smart Dashboard Index based on user role (Admin -> AdminDashboard, Manager -> ManageProducts, Buyer -> MyOrders)
       {
         index: true,
+        element: <DashboardIndex />
+      },
+
+      // Admin Private Routes
+      {
+        path: "analytics",
         element: (
           <AdminRoute>
             <AdminDashboard />

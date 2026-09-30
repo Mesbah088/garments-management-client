@@ -15,5 +15,5 @@ export default function AdminRoute({ children }) {
     return children;
   }
 
-  return <Navigate to="/dashboard" state={{ from: location }} replace />;
+  return <Navigate to="/dashboard/profile" state={{ from: location }} replace />;
 }
