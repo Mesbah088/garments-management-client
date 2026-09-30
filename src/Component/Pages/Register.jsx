@@ -126,13 +126,14 @@ export default function Register() {
             <div className="space-y-1">
               <label className="text-xs font-bold text-gray-700 dark:text-gray-300">Account Role *</label>
               <div className="relative">
-                <Shield className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <Shield className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                 <select
                   {...register('role', { required: 'Role is required' })}
-                  className="w-full pl-10 pr-4 py-2.5 bg-gray-50 dark:bg-slate-800 border border-gray-300 dark:border-slate-700 rounded-xl text-sm font-semibold focus:ring-2 focus:ring-emerald-500 focus:outline-hidden"
+                  className="w-full pl-10 pr-4 py-2.5 bg-gray-50 dark:bg-slate-800 border border-gray-300 dark:border-slate-700 rounded-xl text-sm font-semibold text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-emerald-500 focus:outline-hidden"
                 >
-                  <option value="buyer">Buyer (Order Products & Track Shipments)</option>
+                  <option value="admin">Admin (System Administrator - Full Access & Analytics)</option>
                   <option value="manager">Manager (Manage Production, Orders & Products)</option>
+                  <option value="buyer">Buyer (Order Products & Track Shipments)</option>
                 </select>
               </div>
             </div>

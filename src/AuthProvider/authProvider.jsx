@@ -64,7 +64,7 @@ const AuthProvider = ({ children }) => {
         email,
         photoURL: photoURL || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=200&q=80",
         role,
-        status: "pending",
+        status: "approved",
       };
 
       await api.post("/users", userPayload);
