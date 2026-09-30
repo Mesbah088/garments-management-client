@@ -13,6 +13,9 @@ dist-ssr
 *.local
 .env
 .env.production
+SUBMISSION_INFO.md
+submission*.md
+*.submission.md
 
 # Editor directories and files
 .vscode/*
