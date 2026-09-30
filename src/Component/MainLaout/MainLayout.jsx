@@ -2,6 +2,7 @@ import React from 'react';
 import { Outlet } from 'react-router';
 import Navbar from '../../Shared/Navbar';
 import Footer from '../../Shared/Footer';
+import ThreadAiChatbot from '../AI/ThreadAiChatbot';
 
 const MainLayout = () => {
   return (
@@ -11,6 +12,7 @@ const MainLayout = () => {
         <Outlet />
       </main>
       <Footer />
+      <ThreadAiChatbot />
     </div>
   );
 };

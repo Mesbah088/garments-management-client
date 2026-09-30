@@ -9,6 +9,7 @@ import ErrorPage from "../Component/MainLaout/Errorpage";
 import Home from "../Component/Pages/Home";
 import AllProduct from "../Component/Pages/AllProduct";
 import ProductDetails from "../Component/Pages/ProductDetails";
+import AiEstimator from "../Component/Pages/AiEstimator";
 import About from "../Component/Pages/About";
 import Contact from "../Component/Pages/Contact";
 import Login from "../Component/Pages/Login";
@@ -49,6 +50,10 @@ export const router = createBrowserRouter([
       {
         path: "allproduct",
         element: <AllProduct />
+      },
+      {
+        path: "ai-estimator",
+        element: <AiEstimator />
       },
       {
         path: "product/:id",

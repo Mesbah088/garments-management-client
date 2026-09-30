@@ -210,9 +210,40 @@ export default function AddProduct() {
             </div>
           </div>
 
-          {/* Product Description */}
-          <div className="space-y-1">
-            <label className="text-xs font-bold text-gray-700 dark:text-gray-300">Product Description & Specs *</label>
+          {/* Product Description with AI Auto-Writer */}
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-bold text-gray-700 dark:text-gray-300">
+                Product Description & Technical Specs *
+              </label>
+              <button
+                type="button"
+                disabled={isSuspended}
+                onClick={() => {
+                  const currentTitle = watch('title') || 'Apparel Garment';
+                  const currentCat = watch('category') || 'Shirt';
+                  let aiDesc = `Premium export-grade ${currentTitle.toLowerCase()}. Fabricated using 100% GOTS certified combed organic cotton with high-density double needle stitching. Pre-shrunk enzyme wash finish with dimensional stability and colorfastness compliant with international AQL 2.5 standards. Custom OEM private labeling supported.`;
+                  if (currentCat === 'Jacket') {
+                    aiDesc = `Heavyweight 14.5oz ring-spun denim jacket featuring triple-stitched felled seams, antique brass shank hardware, and reinforced pocket bar-tacks. Hand-finished with vintage stone enzyme wash. Export packaged in moisture-proof polybags.`;
+                  } else if (currentCat === 'Pant') {
+                    aiDesc = `Tailored 98/2 organic cotton-elastane stretch twill trousers with reinforced crotch gusset, pre-washed finish, and heavy-duty YKK brass zipper fly. Designed for all-day breathability and durability.`;
+                  }
+                  setValue('description', aiDesc);
+                  Swal.fire({
+                    icon: 'success',
+                    title: '✨ AI Specs Generated!',
+                    toast: true,
+                    position: 'top-end',
+                    timer: 1800,
+                    showConfirmButton: false
+                  });
+                }}
+                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700 text-xs font-bold hover:bg-emerald-100 transition-colors"
+              >
+                <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
+                <span>AI Auto-Write Specs</span>
+              </button>
+            </div>
             <textarea
               rows="3"
               disabled={isSuspended}

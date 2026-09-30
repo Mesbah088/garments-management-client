@@ -22,6 +22,7 @@ import {
   ExternalLink,
   ShieldAlert
 } from 'lucide-react';
+import ThreadAiChatbot from '../AI/ThreadAiChatbot';
 
 export default function DashboardLayout() {
   const { user, dbUser, logOut } = useContext(AuthContext);
@@ -266,6 +267,7 @@ export default function DashboardLayout() {
         </main>
       </div>
 
+      <ThreadAiChatbot />
     </div>
   );
 }

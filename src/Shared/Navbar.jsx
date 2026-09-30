@@ -88,6 +88,15 @@ export default function Navbar() {
             <NavLink to="/allproduct" className={navLinkClass}>
               All-Product
             </NavLink>
+            <NavLink to="/ai-estimator" className={navLinkClass}>
+              <span className="flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5 text-amber-500 animate-pulse" />
+                AI Estimator
+                <span className="text-[9px] font-black uppercase px-1.5 py-0.2 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-md shadow-2xs">
+                  NEW
+                </span>
+              </span>
+            </NavLink>
             <NavLink to="/about" className={navLinkClass}>
               About Us
             </NavLink>
@@ -245,6 +254,12 @@ export default function Navbar() {
           </NavLink>
           <NavLink to="/allproduct" onClick={closeMenus} className={mobileNavLinkClass}>
             All-Product
+          </NavLink>
+          <NavLink to="/ai-estimator" onClick={closeMenus} className={mobileNavLinkClass}>
+            <span className="flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-amber-500" />
+              AI Garments Cost Estimator
+            </span>
           </NavLink>
           <NavLink to="/about" onClick={closeMenus} className={mobileNavLinkClass}>
             About Us
