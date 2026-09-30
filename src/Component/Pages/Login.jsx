@@ -1,25 +1,24 @@
 import React, { useContext, useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router';
 import { useForm } from 'react-hook-form';
-import Swal from 'sweetalert2';
-import { Scissors, Mail, Lock, LogIn, Sparkles, UserCheck, Shield, ShoppingBag } from 'lucide-react';
+import { Scissors, Mail, Lock, LogIn, Eye, EyeOff } from 'lucide-react';
 import { AuthContext } from '../../AuthProvider/authProvider';
 import usePageTitle from '../../Shared/usePageTitle';
 
 export default function Login() {
   usePageTitle('Login');
 
-  const { logInUser, googleLogin, demoLogin } = useContext(AuthContext);
+  const { logInUser, googleLogin } = useContext(AuthContext);
   const navigate = useNavigate();
   const location = useLocation();
   const from = location.state?.from?.pathname || '/';
 
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const {
     register,
     handleSubmit,
-    setValue,
     formState: { errors }
   } = useForm();
 
@@ -44,15 +43,6 @@ export default function Login() {
     }
   };
 
-  const handleQuickDemo = async (role) => {
-    try {
-      await demoLogin(role);
-      navigate(from, { replace: true });
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
   return (
     <div className="min-h-[85vh] flex items-center justify-center px-4 py-12">
       <div className="max-w-md w-full space-y-6">
@@ -71,41 +61,8 @@ export default function Login() {
             Welcome Back
           </h1>
           <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
-            Sign in to track orders, manage production lines, and monitor inventory
+            Sign in with your email and password to access your dashboard
           </p>
-        </div>
-
-        {/* Demo Login Quick Pills for Fast Testing */}
-        <div className="p-4 rounded-2xl bg-emerald-50/80 dark:bg-slate-900 border border-emerald-200/80 dark:border-slate-800 space-y-2.5">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-emerald-800 dark:text-emerald-300 flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5" /> 1-Click Fast Demo Logins:
-            </span>
-            <span className="text-[10px] text-gray-400">Instant Access</span>
-          </div>
-          <div className="grid grid-cols-3 gap-2">
-            <button
-              type="button"
-              onClick={() => handleQuickDemo('admin')}
-              className="py-2 px-2 text-xs font-bold rounded-xl bg-purple-600 hover:bg-purple-700 text-white shadow-xs flex items-center justify-center gap-1 transition-colors"
-            >
-              <Shield className="w-3 h-3" /> Admin
-            </button>
-            <button
-              type="button"
-              onClick={() => handleQuickDemo('manager')}
-              className="py-2 px-2 text-xs font-bold rounded-xl bg-teal-600 hover:bg-teal-700 text-white shadow-xs flex items-center justify-center gap-1 transition-colors"
-            >
-              <UserCheck className="w-3 h-3" /> Manager
-            </button>
-            <button
-              type="button"
-              onClick={() => handleQuickDemo('buyer')}
-              className="py-2 px-2 text-xs font-bold rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs flex items-center justify-center gap-1 transition-colors"
-            >
-              <ShoppingBag className="w-3 h-3" /> Buyer
-            </button>
-          </div>
         </div>
 
         {/* Login Form */}
@@ -133,11 +90,18 @@ export default function Login() {
               <div className="relative">
                 <Lock className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
                 <input
-                  type="password"
+                  type={showPassword ? 'text' : 'password'}
                   {...register('password', { required: 'Password is required' })}
                   placeholder="••••••••"
-                  className="w-full pl-10 pr-4 py-2.5 bg-gray-50 dark:bg-slate-800 border border-gray-300 dark:border-slate-700 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-hidden"
+                  className="w-full pl-10 pr-10 py-2.5 bg-gray-50 dark:bg-slate-800 border border-gray-300 dark:border-slate-700 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-hidden"
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
               </div>
               {errors.password && <p className="text-[11px] text-rose-500">{errors.password.message}</p>}
             </div>
@@ -146,7 +110,7 @@ export default function Login() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-sm shadow-md transition-all flex items-center justify-center gap-2"
+              className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-sm shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer"
             >
               <LogIn className="w-4 h-4" />
               {loading ? 'Authenticating...' : 'Sign In'}
@@ -165,7 +129,7 @@ export default function Login() {
           <button
             type="button"
             onClick={handleGoogleLogin}
-            className="w-full py-2.5 px-4 bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700 text-gray-700 dark:text-gray-200 font-bold rounded-xl text-xs sm:text-sm shadow-2xs transition-all flex items-center justify-center gap-3"
+            className="w-full py-2.5 px-4 bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700 text-gray-700 dark:text-gray-200 font-bold rounded-xl text-xs sm:text-sm shadow-2xs transition-all flex items-center justify-center gap-3 cursor-pointer"
           >
             <svg className="w-4 h-4" viewBox="0 0 24 24">
               <path
