@@ -11,13 +11,13 @@ A next-generation enterprise apparel manufacturing, wholesale order management, 
 
 ---
 
-## 🔑 Demo Access Credentials (1-Click Login Available in Login Page)
+## 🔑 Demo Access Accounts (1-Click Login Available in Login Page)
 
-| Role | Email | Default Password | Permissions / Capabilities |
-| :--- | :--- | :--- | :--- |
-| **Admin** | `admin@garmentstracker.com` | `Admin@123` | Full system analytics, user management, role elevation, suspension with feedback, catalog management, show on home toggle, and order monitoring. |
-| **Manager** | `manager@garmentstracker.com` | `Manager@123` | Add apparel products with multi-image previews, manage products, approve/reject pending orders, and log live production tracking milestones (Cutting, Sewing, QC, Packing, Dispatched). |
-| **Buyer** | `buyer@garmentstracker.com` | `Buyer@123` | Browse catalog, filter & search apparel, configure FOB wholesale bookings, live auto-calculated price breakdown, cancel pending orders, and view live GPS stage tracking. |
+| Role | Email | Permissions / Capabilities |
+| :--- | :--- | :--- |
+| **Admin** | `admin@garmentstracker.com` | Full system analytics, user management, role elevation, suspension with feedback, catalog management, show on home toggle, and order monitoring. |
+| **Manager** | `manager@garmentstracker.com` | Add apparel products with multi-image previews, manage products, approve/reject pending orders, and log live production tracking milestones (Cutting, Sewing, QC, Packing, Dispatched). |
+| **Buyer** | `buyer@garmentstracker.com` | Browse catalog, filter & search apparel, configure FOB wholesale bookings, live auto-calculated price breakdown, cancel pending orders, and view live GPS stage tracking. |
 
 ---
 
