@@ -1,11 +1,13 @@
 import React from 'react';
-import { Link } from 'react-router';
+import { Link, useRouteError, useLocation } from 'react-router';
 import { motion } from 'framer-motion';
 import { Scissors, Home, ArrowLeft, AlertTriangle } from 'lucide-react';
 import usePageTitle from '../../Shared/usePageTitle';
 
 export default function ErrorPage() {
   usePageTitle('404 Page Not Found');
+  const error = useRouteError();
+  const location = useLocation();
 
   return (
     <div className="min-h-screen bg-slate-950 text-white flex items-center justify-center p-6 relative overflow-hidden">
@@ -22,20 +24,28 @@ export default function ErrorPage() {
         >
           <div className="w-28 h-28 mx-auto rounded-3xl bg-gradient-to-tr from-emerald-500 to-teal-400 p-0.5 shadow-2xl shadow-emerald-500/30 flex items-center justify-center">
             <div className="w-full h-full bg-slate-900 rounded-[22px] flex items-center justify-center">
-              <Scissors className="w-12 h-12 text-emerald-400 transform -rotate-45 animate-pulse" />
+              {error ? (
+                <AlertTriangle className="w-12 h-12 text-rose-400 animate-pulse" />
+              ) : (
+                <Scissors className="w-12 h-12 text-emerald-400 transform -rotate-45 animate-pulse" />
+              )}
             </div>
           </div>
           <span className="absolute -bottom-2 -right-2 bg-rose-500 text-white text-xs font-black px-2.5 py-1 rounded-full border-2 border-slate-900 shadow-md">
-            404
+            {error?.status || '404'}
           </span>
         </motion.div>
 
         <div className="space-y-2">
           <h1 className="text-4xl font-extrabold tracking-tight font-heading">
-            Pattern Not Found!
+            {error ? 'Oops! Something went wrong' : 'Pattern Not Found!'}
           </h1>
           <p className="text-slate-400 text-sm leading-relaxed">
-            The garment cut or production route you are looking for has been moved, unstitched, or does not exist in our factory database.
+            {error?.message || error?.statusText || (
+              <>
+                The production route <code className="text-emerald-400 bg-slate-800 px-2 py-0.5 rounded font-mono">{location.pathname}</code> does not exist in our factory database.
+              </>
+            )}
           </p>
         </div>
 

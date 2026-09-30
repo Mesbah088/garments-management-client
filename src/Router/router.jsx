@@ -52,11 +52,31 @@ export const router = createBrowserRouter([
         element: <AllProduct />
       },
       {
+        path: "all-products",
+        element: <AllProduct />
+      },
+      {
+        path: "all-product",
+        element: <AllProduct />
+      },
+      {
+        path: "products",
+        element: <AllProduct />
+      },
+      {
         path: "ai-estimator",
         element: <AiEstimator />
       },
       {
         path: "product/:id",
+        element: (
+          <PrivateRoute>
+            <ProductDetails />
+          </PrivateRoute>
+        )
+      },
+      {
+        path: "products/:id",
         element: (
           <PrivateRoute>
             <ProductDetails />
