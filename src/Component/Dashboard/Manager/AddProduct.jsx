@@ -12,7 +12,8 @@ import {
   DollarSign, 
   Eye, 
   Trash2,
-  Lock
+  Lock,
+  Sparkles
 } from 'lucide-react';
 import { AuthContext } from '../../../AuthProvider/authProvider';
 import api from '../../../api/api';

@@ -13,7 +13,8 @@ import {
   Moon, 
   ShoppingBag, 
   Layers,
-  ChevronDown
+  ChevronDown,
+  Sparkles
 } from 'lucide-react';
 
 export default function Navbar() {
