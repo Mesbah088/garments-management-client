@@ -29,6 +29,7 @@ export default function AddProduct() {
   const [imageInput, setImageInput] = useState('');
 
   const isSuspended = dbUser?.status === 'suspended';
+  const isPending = dbUser?.status === 'pending' && dbUser?.role === 'manager';
 
   const {
     register,
@@ -59,6 +60,15 @@ export default function AddProduct() {
   };
 
   const onSubmit = async (data) => {
+    if (isPending) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Approval Pending',
+        text: 'Your Manager account is currently awaiting Admin Approval. You can add and publish products once the Admin approves your account.'
+      });
+      return;
+    }
+
     if (isSuspended) {
       Swal.fire({
         icon: 'error',
@@ -90,7 +100,7 @@ export default function AddProduct() {
         demoVideo: data.demoVideo || '',
         paymentOptions: paymentOptions,
         showOnHome: Boolean(data.showOnHome),
-        createdBy: user?.email || 'manager@garmentstracker.com'
+        createdBy: user?.email || dbUser?.email || 'manager@garmentstracker.com'
       };
 
       const res = await api.post('/products', payload);
@@ -105,10 +115,15 @@ export default function AddProduct() {
         });
       }
     } catch (err) {
+      const errorMsg = err.response?.data?.message || 
+        (err.code === 'ERR_NETWORK' 
+          ? 'Network Error: Unable to reach the server. Please ensure the backend server is running on port 5000.' 
+          : err.message);
+
       Swal.fire({
         icon: 'error',
         title: 'Publishing Failed',
-        text: err.response?.data?.message || err.message
+        text: errorMsg
       });
     } finally {
       setSubmitting(false);
@@ -127,6 +142,17 @@ export default function AddProduct() {
           Define fabric specifications, MOQ thresholds, payment models, and factory production media
         </p>
       </div>
+
+      {/* Pending Approval Alert */}
+      {isPending && (
+        <div className="p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900/60 flex items-start gap-3 text-amber-800 dark:text-amber-300">
+          <Clock className="w-5 h-5 shrink-0 mt-0.5 text-amber-600" />
+          <div className="text-xs space-y-1">
+            <strong className="block font-bold text-sm">Manager Account Awaiting Admin Approval</strong>
+            <span>Your manager account has been registered and is waiting for review by the System Administrator. Once approved in the Manage Users dashboard, you will be authorized to publish products.</span>
+          </div>
+        </div>
+      )}
 
       {/* Suspension Alert */}
       {isSuspended && (

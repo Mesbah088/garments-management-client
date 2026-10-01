@@ -44,7 +44,19 @@ export default function Register() {
     setLoading(true);
     try {
       await registerUser(data.name, data.email, data.photoURL, data.password, data.role);
-      navigate('/dashboard/profile');
+      if (data.role === 'manager') {
+        Swal.fire({
+          icon: 'info',
+          title: 'Manager Account Registered',
+          html: `<p class="text-sm text-gray-600 dark:text-gray-300 mb-2">Welcome <strong>${data.name}</strong>!</p><p class="text-xs text-gray-500 dark:text-gray-400">Your Manager account has been created and is awaiting <strong>Admin Approval</strong> before you can add and publish apparel products to the catalog.</p>`,
+          confirmButtonText: 'Go to Workspace',
+          confirmButtonColor: '#059669'
+        }).then(() => {
+          navigate('/dashboard');
+        });
+      } else {
+        navigate('/dashboard');
+      }
     } catch (err) {
       console.error(err);
     } finally {
@@ -70,7 +82,7 @@ export default function Register() {
             Create System Account
           </h1>
           <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
-            Register as a Buyer to place apparel bookings, or as a Production Manager
+            Register as a Buyer for instant ordering, or as a Production Manager (Requires Admin Approval)
           </p>
         </div>
 
@@ -131,9 +143,8 @@ export default function Register() {
                   {...register('role', { required: 'Role is required' })}
                   className="w-full pl-10 pr-4 py-2.5 bg-gray-50 dark:bg-slate-800 border border-gray-300 dark:border-slate-700 rounded-xl text-sm font-semibold text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-emerald-500 focus:outline-hidden"
                 >
-                  <option value="admin">Admin (System Administrator - Full Access & Analytics)</option>
-                  <option value="manager">Manager (Manage Production, Orders & Products)</option>
-                  <option value="buyer">Buyer (Order Products & Track Shipments)</option>
+                  <option value="buyer">Wholesale Buyer (Instant Access - Order & Track Apparel)</option>
+                  <option value="manager">Production Manager (Manage Products & Assembly - Requires Admin Approval)</option>
                 </select>
               </div>
             </div>
