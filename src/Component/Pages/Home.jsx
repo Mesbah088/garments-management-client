@@ -24,6 +24,26 @@ import usePageTitle from '../../Shared/usePageTitle';
 import LoadingSpinner from '../../Shared/LoadingSpinner';
 import AnimatedCounter from '../../Shared/AnimatedCounter';
 
+const normalizeProduct = (p) => {
+  if (!p) return null;
+  const rawImg = Array.isArray(p.images) && p.images.length > 0 ? p.images[0] : (p.product_image || p.image || '');
+  return {
+    _id: p._id || p.id,
+    title: p.title || p.product_name || p.name || 'Garment Export Style',
+    description: p.description || p.product_description || 'High-durability export apparel with certified fabric quality.',
+    category: p.category || p.product_category || 'Shirt',
+    price: Number(p.price || p.price_usd || 0),
+    quantity: Number(p.quantity || p.available_quantity || p.availableQty || 0),
+    minOrder: Number(p.minOrder || p.minimum_order || p.minQty || 1),
+    images: Array.isArray(p.images) && p.images.length > 0 
+      ? p.images 
+      : [rawImg || "https://images.unsplash.com/photo-1523381210434-271e8be1f52b?auto=format&fit=crop&w=800&q=80"],
+    demoVideo: p.demoVideo || p.demo_video || '',
+    showOnHome: p.showOnHome === true || p.show_on_home === 'permit' || p.show_on_home === true,
+    createdBy: p.createdBy || p.createdByName || 'manager@garmentstracker.com'
+  };
+};
+
 export default function Home() {
   usePageTitle('Home | Smart Production & Order Tracker');
   
@@ -35,12 +55,37 @@ export default function Home() {
   useEffect(() => {
     const fetchHomeProducts = async () => {
       try {
-        const res = await api.get('/products?limit=6&showOnHome=true');
-        if (Array.isArray(res.data)) {
-          setFeaturedProducts(res.data);
-        } else if (res.data?.products) {
-          setFeaturedProducts(res.data.products.slice(0, 6));
+        let items = [];
+        try {
+          const res = await api.get('/products?limit=6&showOnHome=true');
+          const raw = Array.isArray(res.data) ? res.data : (res.data?.products || []);
+          items = raw.map(normalizeProduct).filter(Boolean);
+        } catch (e) {
+          console.warn('showOnHome query error, falling back to all products', e);
         }
+
+        // If fewer than 6, fetch general products to ensure home page is full of export items
+        if (items.length < 6) {
+          try {
+            const fallbackRes = await api.get('/products?limit=6');
+            const fallbackRaw = Array.isArray(fallbackRes.data) ? fallbackRes.data : (fallbackRes.data?.products || []);
+            const normalizedFallback = fallbackRaw.map(normalizeProduct).filter(Boolean);
+            
+            // Merge unique by _id
+            const existingIds = new Set(items.map(i => String(i._id)));
+            for (const item of normalizedFallback) {
+              if (!existingIds.has(String(item._id))) {
+                items.push(item);
+                existingIds.add(String(item._id));
+              }
+              if (items.length >= 6) break;
+            }
+          } catch (e) {
+            console.error('Error fetching fallback home products:', e);
+          }
+        }
+
+        setFeaturedProducts(items.slice(0, 6));
       } catch (err) {
         console.error('Error loading featured products:', err);
       } finally {

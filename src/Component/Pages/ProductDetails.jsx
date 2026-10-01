@@ -56,15 +56,30 @@ export default function ProductDetails() {
     const fetchProduct = async () => {
       try {
         const res = await api.get(`/products/${id}`);
-        setProduct(res.data);
-        if (res.data?.images?.length > 0) {
-          setSelectedImage(res.data.images[0]);
-        }
-        if (res.data?.minOrder) {
-          setValue('quantity', res.data.minOrder);
-        }
-        if (res.data?.paymentOptions?.length > 0) {
-          setValue('paymentOption', res.data.paymentOptions[0]);
+        const d = res.data;
+        if (d) {
+          const rawImg = Array.isArray(d.images) && d.images.length > 0 ? d.images[0] : (d.product_image || d.image || '');
+          const normalized = {
+            ...d,
+            _id: d._id || d.id,
+            title: d.title || d.product_name || d.name || 'Garment Item',
+            description: d.description || d.product_description || '',
+            category: d.category || d.product_category || 'Shirt',
+            price: Number(d.price || d.price_usd || 0),
+            quantity: Number(d.quantity || d.available_quantity || d.availableQty || 0),
+            minOrder: Number(d.minOrder || d.minimum_order || d.minQty || 1),
+            images: Array.isArray(d.images) && d.images.length > 0 
+              ? d.images 
+              : [rawImg || "https://images.unsplash.com/photo-1523381210434-271e8be1f52b?auto=format&fit=crop&w=800&q=80"],
+            demoVideo: d.demoVideo || d.demo_video || '',
+            paymentOptions: Array.isArray(d.paymentOptions) && d.paymentOptions.length > 0
+              ? d.paymentOptions 
+              : (d.payment_method ? [d.payment_method] : ['Cash on Delivery', 'PayFirst'])
+          };
+          setProduct(normalized);
+          setSelectedImage(normalized.images[0]);
+          setValue('quantity', normalized.minOrder);
+          setValue('paymentOption', normalized.paymentOptions[0] || 'Cash on Delivery');
         }
       } catch (err) {
         console.error('Failed to load product details:', err);

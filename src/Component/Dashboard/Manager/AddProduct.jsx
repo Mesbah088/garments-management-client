@@ -40,7 +40,7 @@ export default function AddProduct() {
   } = useForm({
     defaultValues: {
       category: 'Shirt',
-      showOnHome: false,
+      showOnHome: true,
       paymentOption1: true,
       paymentOption2: true,
       minOrder: 50,

@@ -20,6 +20,26 @@ export default function AllProduct() {
 
   const categories = ['All', 'Shirt', 'Pant', 'Jacket', 'Accessories'];
 
+  const normalizeProduct = (p) => {
+    if (!p) return null;
+    const rawImg = Array.isArray(p.images) && p.images.length > 0 ? p.images[0] : (p.product_image || p.image || '');
+    return {
+      _id: p._id || p.id,
+      title: p.title || p.product_name || p.name || 'Garment Item',
+      description: p.description || p.product_description || 'High-durability export apparel with certified fabric quality.',
+      category: p.category || p.product_category || 'Shirt',
+      price: Number(p.price || p.price_usd || 0),
+      quantity: Number(p.quantity || p.available_quantity || p.availableQty || 0),
+      minOrder: Number(p.minOrder || p.minimum_order || p.minQty || 1),
+      images: Array.isArray(p.images) && p.images.length > 0 
+        ? p.images 
+        : [rawImg || "https://images.unsplash.com/photo-1523381210434-271e8be1f52b?auto=format&fit=crop&w=800&q=80"],
+      demoVideo: p.demoVideo || p.demo_video || '',
+      showOnHome: p.showOnHome === true || p.show_on_home === 'permit' || p.show_on_home === true,
+      createdBy: p.createdBy || p.createdByName || 'manager@garmentstracker.com'
+    };
+  };
+
   // Fetch products with search, filter, sort, pagination
   useEffect(() => {
     const fetchProducts = async () => {
@@ -33,15 +53,24 @@ export default function AllProduct() {
         queryParams.set('limit', 6);
 
         const res = await api.get(`/products?${queryParams.toString()}`);
+        let rawProducts = [];
+        let total = 0;
+        let pages = 1;
+
         if (res.data?.products) {
-          setProducts(res.data.products);
-          setTotalPages(res.data.totalPages || 1);
-          setTotalCount(res.data.total || res.data.products.length);
+          rawProducts = res.data.products;
+          total = res.data.total || res.data.products.length;
+          pages = res.data.totalPages || Math.ceil(total / 6) || 1;
         } else if (Array.isArray(res.data)) {
-          setProducts(res.data);
-          setTotalPages(Math.ceil(res.data.length / 6) || 1);
-          setTotalCount(res.data.length);
+          rawProducts = res.data;
+          total = res.data.length;
+          pages = Math.ceil(res.data.length / 6) || 1;
         }
+
+        const normalized = rawProducts.map(normalizeProduct).filter(Boolean);
+        setProducts(normalized);
+        setTotalPages(pages);
+        setTotalCount(total);
       } catch (err) {
         console.error('Failed to fetch products:', err);
       } finally {
