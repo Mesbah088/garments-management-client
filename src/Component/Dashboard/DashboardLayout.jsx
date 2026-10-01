@@ -20,7 +20,10 @@ import {
   Moon,
   ChevronRight,
   ExternalLink,
-  ShieldAlert
+  ShieldAlert,
+  DollarSign,
+  TrendingUp,
+  MessageSquare
 } from 'lucide-react';
 import ThreadAiChatbot from '../AI/ThreadAiChatbot';
 
@@ -28,7 +31,29 @@ export default function DashboardLayout() {
   const { user, dbUser, logOut } = useContext(AuthContext);
   const { theme, toggleTheme } = useTheme();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
   const navigate = useNavigate();
+
+  // Poll for total unread chat messages
+  React.useEffect(() => {
+    const fetchUnread = async () => {
+      const email = user?.email || dbUser?.email;
+      if (!email) return;
+      try {
+        const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+        const res = await fetch(`${baseUrl}/messages/unread-total?email=${encodeURIComponent(email)}`);
+        if (res.ok) {
+          const data = await res.json();
+          setUnreadCount(data.totalUnread || 0);
+        }
+      } catch (e) {
+        // silent
+      }
+    };
+    fetchUnread();
+    const interval = setInterval(fetchUnread, 4000);
+    return () => clearInterval(interval);
+  }, [user, dbUser]);
 
   const handleLogout = async () => {
     await logOut();
@@ -129,6 +154,18 @@ export default function DashboardLayout() {
                   <LayoutDashboard className="w-4 h-4 text-emerald-500" />
                   Analytics Overview
                 </NavLink>
+                <NavLink to="/dashboard/chat" className={linkClasses} onClick={() => setSidebarOpen(false)}>
+                  <div className="relative">
+                    <MessageSquare className="w-4 h-4 text-emerald-500" />
+                    {unreadCount > 0 && <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-rose-500 animate-pulse" />}
+                  </div>
+                  <span className="flex-1">Direct Chat & Knock Hub</span>
+                  {unreadCount > 0 && (
+                    <span className="px-1.5 py-0.5 rounded-full bg-emerald-600 text-white text-[10px] font-extrabold">
+                      {unreadCount}
+                    </span>
+                  )}
+                </NavLink>
                 <NavLink to="/dashboard/manage-users" className={linkClasses} onClick={() => setSidebarOpen(false)}>
                   <Users className="w-4 h-4 text-blue-500" />
                   Manage Users
@@ -147,6 +184,22 @@ export default function DashboardLayout() {
             {/* MANAGER ONLY LINKS */}
             {role === 'manager' && (
               <>
+                <NavLink to="/dashboard/financials" className={linkClasses} onClick={() => setSidebarOpen(false)}>
+                  <DollarSign className="w-4 h-4 text-emerald-500" />
+                  Financials & Investment
+                </NavLink>
+                <NavLink to="/dashboard/chat" className={linkClasses} onClick={() => setSidebarOpen(false)}>
+                  <div className="relative">
+                    <MessageSquare className="w-4 h-4 text-emerald-500" />
+                    {unreadCount > 0 && <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-rose-500 animate-pulse" />}
+                  </div>
+                  <span className="flex-1">Buyer Chat & Floor Knock</span>
+                  {unreadCount > 0 && (
+                    <span className="px-1.5 py-0.5 rounded-full bg-emerald-600 text-white text-[10px] font-extrabold">
+                      {unreadCount}
+                    </span>
+                  )}
+                </NavLink>
                 <NavLink to="/dashboard/add-product" className={linkClasses} onClick={() => setSidebarOpen(false)}>
                   <PlusCircle className="w-4 h-4 text-emerald-500" />
                   Add Product
@@ -172,6 +225,18 @@ export default function DashboardLayout() {
                 <NavLink to="/dashboard/my-orders" className={linkClasses} onClick={() => setSidebarOpen(false)}>
                   <ShoppingBag className="w-4 h-4 text-emerald-500" />
                   My Orders
+                </NavLink>
+                <NavLink to="/dashboard/chat" className={linkClasses} onClick={() => setSidebarOpen(false)}>
+                  <div className="relative">
+                    <MessageSquare className="w-4 h-4 text-emerald-500" />
+                    {unreadCount > 0 && <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-rose-500 animate-pulse" />}
+                  </div>
+                  <span className="flex-1">Knock Manager / Live Chat</span>
+                  {unreadCount > 0 && (
+                    <span className="px-1.5 py-0.5 rounded-full bg-emerald-600 text-white text-[10px] font-extrabold">
+                      {unreadCount}
+                    </span>
+                  )}
                 </NavLink>
               </>
             )}
@@ -241,6 +306,18 @@ export default function DashboardLayout() {
           </div>
 
           <div className="flex items-center gap-3">
+            {/* Quick Live Chat Header Icon */}
+            <Link
+              to="/dashboard/chat"
+              className="relative p-2.5 rounded-xl text-gray-600 dark:text-gray-300 hover:bg-emerald-50 hover:text-emerald-600 dark:hover:bg-slate-800 transition-colors"
+              title="Open Live Chat Hub"
+            >
+              <MessageSquare className="w-5 h-5" />
+              {unreadCount > 0 && (
+                <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              )}
+            </Link>
+
             {/* Theme switch */}
             <button
               onClick={toggleTheme}

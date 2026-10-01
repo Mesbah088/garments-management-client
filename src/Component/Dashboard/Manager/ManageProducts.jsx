@@ -192,7 +192,7 @@ export default function ManageProducts() {
 
                     {/* Price */}
                     <td className="py-4 px-6 font-bold text-gray-900 dark:text-white">
-                      ${Number(prod.price).toFixed(2)}
+                      ৳{Number(prod.price).toLocaleString()}
                     </td>
 
                     {/* Payment Mode */}
@@ -262,7 +262,7 @@ export default function ManageProducts() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="text-xs font-bold text-gray-700 dark:text-gray-300">Price ($)</label>
+                  <label className="text-xs font-bold text-gray-700 dark:text-gray-300">Price (৳ BDT)</label>
                   <input
                     type="number"
                     step="0.01"

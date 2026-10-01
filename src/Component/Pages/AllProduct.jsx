@@ -179,7 +179,7 @@ export default function AllProduct() {
                     {product.category}
                   </div>
                   <div className="absolute top-4 right-4 bg-emerald-600 text-white px-3 py-1 rounded-full text-xs font-extrabold shadow-md">
-                    ${Number(product.price).toFixed(2)} / unit
+                    ৳{Number(product.price).toLocaleString()} / unit
                   </div>
                 </div>
 

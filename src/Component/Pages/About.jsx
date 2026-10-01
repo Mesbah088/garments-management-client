@@ -2,15 +2,16 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Scissors, Award, Factory, Users, Globe2, ShieldCheck, CheckCircle2 } from 'lucide-react';
 import usePageTitle from '../../Shared/usePageTitle';
+import AnimatedCounter from '../../Shared/AnimatedCounter';
 
 export default function About() {
   usePageTitle('About Us | Factory Heritage & Capacity');
 
   const stats = [
-    { label: 'Established', value: '2014' },
-    { label: 'Floor Space', value: '120,000 sq ft' },
-    { label: 'Export Destinations', value: '35+ Countries' },
-    { label: 'Skilled Artisans', value: '1,400+ Staff' },
+    { label: 'Established', end: 2014, duration: 1.8 },
+    { label: 'Floor Space', end: 120000, suffix: ' sq ft', duration: 2 },
+    { label: 'Export Destinations', end: 35, suffix: '+ Countries', duration: 1.6 },
+    { label: 'Skilled Artisans', end: 1400, suffix: '+ Staff', duration: 2 },
   ];
 
   return (
@@ -37,7 +38,7 @@ export default function About() {
           {stats.map((st, i) => (
             <div key={i} className="text-center space-y-1">
               <span className="text-3xl sm:text-4xl font-black text-emerald-600 dark:text-emerald-400 font-heading">
-                {st.value}
+                <AnimatedCounter end={st.end} suffix={st.suffix} duration={st.duration} />
               </span>
               <p className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">{st.label}</p>
             </div>

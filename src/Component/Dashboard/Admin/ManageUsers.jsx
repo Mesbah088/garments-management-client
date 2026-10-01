@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router';
 import Swal from 'sweetalert2';
 import { 
   Users, 
@@ -11,7 +12,8 @@ import {
   X, 
   AlertTriangle,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  MessageSquare
 } from 'lucide-react';
 import api from '../../../api/api';
 import usePageTitle from '../../../Shared/usePageTitle';
@@ -291,6 +293,15 @@ export default function ManageUsers() {
                     {/* Actions */}
                     <td className="py-4 px-6 text-right">
                       <div className="flex items-center justify-end gap-2">
+                        {/* Direct In-App Message */}
+                        <Link
+                          to={`/dashboard/chat?email=${encodeURIComponent(u.email)}`}
+                          className="p-1.5 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-600 hover:text-white text-indigo-600 dark:text-indigo-400 transition-colors"
+                          title={`Message / Knock ${u.name}`}
+                        >
+                          <MessageSquare className="w-4 h-4" />
+                        </Link>
+
                         <button
                           onClick={() => openUpdateModal(u)}
                           className="px-3 py-1.5 rounded-xl bg-gray-100 hover:bg-emerald-50 dark:bg-slate-800 dark:hover:bg-emerald-950/50 text-gray-700 hover:text-emerald-600 dark:text-gray-300 dark:hover:text-emerald-400 font-semibold text-xs transition-colors flex items-center gap-1.5"

@@ -173,13 +173,13 @@ export default function AddProduct() {
             </div>
 
             <div className="space-y-1">
-              <label className="text-xs font-bold text-gray-700 dark:text-gray-300">Unit Price ($ USD) *</label>
+              <label className="text-xs font-bold text-gray-700 dark:text-gray-300">Unit Price (৳ BDT) *</label>
               <input
                 type="number"
                 step="0.01"
                 disabled={isSuspended}
                 {...register('price', { required: 'Price is required', min: { value: 0.1, message: 'Price must be positive' } })}
-                placeholder="24.50"
+                placeholder="2850"
                 className="w-full px-4 py-2.5 bg-gray-50 dark:bg-slate-800 border border-gray-300 dark:border-slate-700 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-hidden disabled:opacity-50"
               />
               {errors.price && <p className="text-[11px] text-rose-500">{errors.price.message}</p>}

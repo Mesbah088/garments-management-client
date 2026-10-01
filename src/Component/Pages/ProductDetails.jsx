@@ -16,7 +16,8 @@ import {
   X, 
   ArrowLeft,
   Lock,
-  DollarSign
+  DollarSign,
+  MessageSquare
 } from 'lucide-react';
 import { AuthContext } from '../../AuthProvider/authProvider';
 import api from '../../api/api';
@@ -246,9 +247,9 @@ export default function ProductDetails() {
             </h1>
             <div className="flex items-baseline gap-3 pt-2">
               <span className="text-4xl font-black text-emerald-600 dark:text-emerald-400 font-heading">
-                ${Number(product.price).toFixed(2)}
+                ৳{Number(product.price).toLocaleString()}
               </span>
-              <span className="text-sm font-medium text-gray-400">per piece (Wholesale FOB)</span>
+              <span className="text-sm font-medium text-gray-400">BDT per piece (Wholesale FOB)</span>
             </div>
           </div>
 
@@ -316,13 +317,33 @@ export default function ProductDetails() {
                 </div>
               </div>
             ) : (
-              <button
-                onClick={() => setIsBookingOpen(true)}
-                className="w-full py-4 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-extrabold text-base shadow-xl shadow-emerald-600/30 hover:shadow-emerald-600/50 hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2"
-              >
-                <ShoppingBag className="w-5 h-5" />
-                Book Production Order Now
-              </button>
+              <div className="flex flex-col sm:flex-row items-center gap-3">
+                <button
+                  onClick={() => setIsBookingOpen(true)}
+                  className="flex-1 w-full py-4 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-extrabold text-base shadow-xl shadow-emerald-600/30 hover:shadow-emerald-600/50 hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2"
+                >
+                  <ShoppingBag className="w-5 h-5" />
+                  Book Production Order Now
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    const wpText = encodeURIComponent(
+                      `👋 *Hello Merchandiser / Manager,*\n\n` +
+                      `I am interested in your apparel product: *${product.title}* (৳${Number(product.price).toLocaleString()} BDT/pc, MOQ ${product.minOrder} pcs).\n\n` +
+                      `Could you please share fabric swatches / custom sample details?\n\n` +
+                      `🔗 *Product URL:* ${window.location.href}`
+                    );
+                    window.open(`https://wa.me/?text=${wpText}`, '_blank');
+                  }}
+                  className="w-full sm:w-auto px-5 py-4 rounded-2xl bg-[#25D366] hover:bg-[#1ebd5a] text-white font-bold text-sm flex items-center justify-center gap-2 transition-all shadow-md shadow-emerald-600/20"
+                  title="Direct WhatsApp Inquire with Merchandiser"
+                >
+                  <MessageSquare className="w-5 h-5" />
+                  <span>WhatsApp Inquire</span>
+                </button>
+              </div>
             )}
           </div>
 
@@ -370,8 +391,8 @@ export default function ProductDetails() {
                     <strong className="text-gray-800 dark:text-gray-200 truncate block">{product.title}</strong>
                   </div>
                   <div>
-                    <span className="text-gray-400 font-bold block">Unit Price (FOB)</span>
-                    <strong className="text-emerald-600 dark:text-emerald-400 text-sm font-extrabold">${unitPrice.toFixed(2)}</strong>
+                    <span className="text-gray-400 font-bold block">Unit Price (FOB BDT)</span>
+                    <strong className="text-emerald-600 dark:text-emerald-400 text-sm font-extrabold">৳{Number(unitPrice).toLocaleString()}</strong>
                   </div>
                 </div>
 
@@ -422,10 +443,10 @@ export default function ProductDetails() {
 
                   <div className="space-y-1">
                     <label className="text-xs font-bold text-gray-700 dark:text-gray-300">
-                      Calculated Order Price (Read-Only)
+                      Calculated Order Price (৳ BDT)
                     </label>
                     <div className="px-4 py-2.5 bg-gray-100 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl text-base font-extrabold text-emerald-600 dark:text-emerald-400">
-                      ${calculatedTotalPrice}
+                      ৳{Number(calculatedTotalPrice).toLocaleString()} BDT
                     </div>
                   </div>
                 </div>
@@ -503,7 +524,7 @@ export default function ProductDetails() {
                 <div className="p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900/60 text-emerald-900 dark:text-emerald-200 text-sm space-y-1">
                   <div className="flex items-center justify-between">
                     <span>Order Total:</span>
-                    <strong className="text-xl font-black">${calculatedTotalPrice} USD</strong>
+                    <strong className="text-xl font-black">৳{Number(calculatedTotalPrice).toLocaleString()} BDT</strong>
                   </div>
                   <p className="text-xs text-emerald-700 dark:text-emerald-300">
                     Payment simulation via Stripe / PayFirst for {bookingData?.quantity} units.
@@ -558,7 +579,7 @@ export default function ProductDetails() {
                     disabled={submitting}
                     className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-sm shadow-md transition-all flex items-center gap-2"
                   >
-                    {submitting ? 'Processing Authorization...' : `Pay $${calculatedTotalPrice} & Confirm Order`}
+                    {submitting ? 'Processing Authorization...' : `Pay ৳${Number(calculatedTotalPrice).toLocaleString()} BDT & Confirm Order`}
                   </button>
                 </div>
               </div>

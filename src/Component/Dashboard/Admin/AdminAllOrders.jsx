@@ -167,7 +167,7 @@ export default function AdminAllOrders() {
 
                     {/* Total Price */}
                     <td className="py-4 px-6 font-extrabold text-emerald-600 dark:text-emerald-400">
-                      ${Number(ord.totalPrice || 0).toLocaleString()}
+                      ৳{Number(ord.totalPrice || 0).toLocaleString()}
                     </td>
 
                     {/* Status */}
@@ -241,7 +241,7 @@ export default function AdminAllOrders() {
               </div>
               <div>
                 <span className="text-gray-400 font-bold block">Order Volume</span>
-                <strong className="text-gray-800 dark:text-gray-200">{selectedOrder.quantity} units (${selectedOrder.totalPrice})</strong>
+                <strong className="text-gray-800 dark:text-gray-200">{selectedOrder.quantity} units (৳{Number(selectedOrder.totalPrice || 0).toLocaleString()})</strong>
               </div>
               <div>
                 <span className="text-gray-400 font-bold block">Payment Mode</span>

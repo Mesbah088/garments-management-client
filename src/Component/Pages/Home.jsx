@@ -22,6 +22,7 @@ import {
 import api from '../../api/api';
 import usePageTitle from '../../Shared/usePageTitle';
 import LoadingSpinner from '../../Shared/LoadingSpinner';
+import AnimatedCounter from '../../Shared/AnimatedCounter';
 
 export default function Home() {
   usePageTitle('Home | Smart Production & Order Tracker');
@@ -166,15 +167,21 @@ export default function Home() {
               {/* Badges */}
               <div className="grid grid-cols-3 gap-4 pt-6 border-t border-gray-200/80 dark:border-slate-800/80 max-w-lg">
                 <div>
-                  <h4 className="text-2xl font-black text-gray-900 dark:text-white font-heading">150K+</h4>
+                  <h4 className="text-2xl font-black text-gray-900 dark:text-white font-heading">
+                    <AnimatedCounter end={150} suffix="K+" duration={2} />
+                  </h4>
                   <p className="text-xs text-gray-500 dark:text-gray-400">Monthly Garments</p>
                 </div>
                 <div>
-                  <h4 className="text-2xl font-black text-gray-900 dark:text-white font-heading">99.8%</h4>
+                  <h4 className="text-2xl font-black text-gray-900 dark:text-white font-heading">
+                    <AnimatedCounter end={99.8} decimals={1} suffix="%" duration={2} />
+                  </h4>
                   <p className="text-xs text-gray-500 dark:text-gray-400">AQL QC Standard</p>
                 </div>
                 <div>
-                  <h4 className="text-2xl font-black text-gray-900 dark:text-white font-heading">48 Hrs</h4>
+                  <h4 className="text-2xl font-black text-gray-900 dark:text-white font-heading">
+                    <AnimatedCounter end={48} suffix=" Hrs" duration={1.5} />
+                  </h4>
                   <p className="text-xs text-gray-500 dark:text-gray-400">Sample Turnaround</p>
                 </div>
               </div>
@@ -229,6 +236,46 @@ export default function Home() {
         </div>
       </section>
 
+      {/* LIVE MILESTONE NUMERICAL STATS BANNER (Scroll-triggered toggling & fixing) */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="p-8 sm:p-10 rounded-3xl bg-gradient-to-r from-slate-900 via-emerald-950 to-slate-900 text-white shadow-xl border border-emerald-500/20 relative overflow-hidden">
+          <div className="absolute -right-20 -top-20 w-80 h-80 bg-emerald-500/10 blur-3xl rounded-full pointer-events-none" />
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 relative z-10">
+            <div className="space-y-1 text-center sm:text-left border-r border-emerald-800/30 last:border-0 pr-4">
+              <div className="text-3xl sm:text-4xl lg:text-5xl font-black text-emerald-400 font-heading">
+                <AnimatedCounter end={120} suffix="+" duration={2} />
+              </div>
+              <p className="text-xs sm:text-sm font-bold text-gray-300">Global Fashion Brands</p>
+              <p className="text-[11px] text-gray-400">Export partners across 35 countries</p>
+            </div>
+
+            <div className="space-y-1 text-center sm:text-left border-r border-emerald-800/30 last:border-0 pr-4">
+              <div className="text-3xl sm:text-4xl lg:text-5xl font-black text-teal-400 font-heading">
+                <AnimatedCounter end={2.5} decimals={1} suffix="M+" duration={2.2} />
+              </div>
+              <p className="text-xs sm:text-sm font-bold text-gray-300">Garments Exported</p>
+              <p className="text-[11px] text-gray-400">Shipped with zero QC rejection</p>
+            </div>
+
+            <div className="space-y-1 text-center sm:text-left border-r border-emerald-800/30 last:border-0 pr-4">
+              <div className="text-3xl sm:text-4xl lg:text-5xl font-black text-cyan-400 font-heading">
+                <AnimatedCounter end={8500} suffix="+" duration={2} />
+              </div>
+              <p className="text-xs sm:text-sm font-bold text-gray-300">Orders Delivered</p>
+              <p className="text-[11px] text-gray-400">Across woven, knit & denim</p>
+            </div>
+
+            <div className="space-y-1 text-center sm:text-left pr-4">
+              <div className="text-3xl sm:text-4xl lg:text-5xl font-black text-emerald-300 font-heading">
+                <AnimatedCounter end={99.9} decimals={1} suffix="%" duration={2} />
+              </div>
+              <p className="text-xs sm:text-sm font-bold text-gray-300">On-Time Dispatch Rate</p>
+              <p className="text-[11px] text-gray-400">Air & Sea freight tracked</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* 2. OUR PRODUCTS (6 cards from MongoDB with limit) */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-4">
@@ -276,7 +323,7 @@ export default function Home() {
                       {product.category}
                     </div>
                     <div className="absolute top-4 right-4 bg-emerald-600 text-white px-3 py-1 rounded-full text-xs font-extrabold shadow-md">
-                      ${Number(product.price).toFixed(2)} / unit
+                      ৳{Number(product.price).toLocaleString()} / unit
                     </div>
                   </div>
 
@@ -453,19 +500,27 @@ export default function Home() {
 
               <div className="grid grid-cols-2 gap-6 pt-2">
                 <div className="space-y-1">
-                  <div className="text-2xl font-black text-emerald-400 font-heading">18+ Assembly Lines</div>
+                  <div className="text-2xl font-black text-emerald-400 font-heading">
+                    <AnimatedCounter end={18} suffix="+" duration={1.8} /> Assembly Lines
+                  </div>
                   <p className="text-xs text-slate-400">Automated sewing & overlock stitching</p>
                 </div>
                 <div className="space-y-1">
-                  <div className="text-2xl font-black text-teal-400 font-heading">100% Solar Powered</div>
+                  <div className="text-2xl font-black text-teal-400 font-heading">
+                    <AnimatedCounter end={100} suffix="%" duration={2} /> Solar Powered
+                  </div>
                   <p className="text-xs text-slate-400">Rooftop renewable photovoltaic arrays</p>
                 </div>
                 <div className="space-y-1">
-                  <div className="text-2xl font-black text-cyan-400 font-heading">Laser CAD Cutting</div>
+                  <div className="text-2xl font-black text-cyan-400 font-heading">
+                    <AnimatedCounter end={99.4} decimals={1} suffix="%" duration={1.8} /> CAD Efficiency
+                  </div>
                   <p className="text-xs text-slate-400">Zero-waste computer pattern optimization</p>
                 </div>
                 <div className="space-y-1">
-                  <div className="text-2xl font-black text-indigo-400 font-heading">3-Step QC Gate</div>
+                  <div className="text-2xl font-black text-indigo-400 font-heading">
+                    <AnimatedCounter end={3} suffix="-Step" duration={1.2} /> QC Gate
+                  </div>
                   <p className="text-xs text-slate-400">Needle detection & AQL 2.5 defect audits</p>
                 </div>
               </div>

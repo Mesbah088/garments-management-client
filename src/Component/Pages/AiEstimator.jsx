@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { motion } from 'framer-motion';
 import Swal from 'sweetalert2';
 import { 
@@ -15,12 +15,16 @@ import {
   ArrowRight,
   Leaf,
   CheckCircle2,
-  TrendingDown
+  TrendingDown,
+  User
 } from 'lucide-react';
+import { AuthContext } from '../../AuthProvider/authProvider';
 import usePageTitle from '../../Shared/usePageTitle';
 
 export default function AiEstimator() {
   usePageTitle('AI Garment Cost & Production Estimator');
+  const { user, dbUser } = useContext(AuthContext);
+  const clientName = user?.displayName || dbUser?.name || 'Valued Commercial Buyer';
 
   const [category, setCategory] = useState('Jacket');
   const [fabricGsm, setFabricGsm] = useState('14.5oz Denim (Ring-Spun)');
@@ -40,11 +44,11 @@ export default function AiEstimator() {
     setEstimateResult(null);
 
     setTimeout(() => {
-      let baseCost = 18.0;
-      if (category === 'Jacket') baseCost = 32.0;
-      if (category === 'Shirt') baseCost = 14.5;
-      if (category === 'Pant') baseCost = 20.0;
-      if (category === 'Hoodie') baseCost = 22.5;
+      let baseCost = 1850;
+      if (category === 'Jacket') baseCost = 2850;
+      if (category === 'Shirt') baseCost = 1450;
+      if (category === 'Pant') baseCost = 1750;
+      if (category === 'Hoodie') baseCost = 2150;
 
       // Volume bulk discount calculation
       let volumeMultiplier = 1.0;
@@ -53,15 +57,15 @@ export default function AiEstimator() {
       else if (quantity >= 1000) volumeMultiplier = 0.93;
       else if (quantity >= 500) volumeMultiplier = 0.97;
 
-      // Trim add-ons
+      // Trim add-ons in BDT
       let trimAddon = 0;
-      if (customTrims.enzymeWash) trimAddon += 1.8;
-      if (customTrims.ykkZippers) trimAddon += 1.2;
-      if (customTrims.customLabels) trimAddon += 0.6;
-      if (customTrims.organicDye) trimAddon += 1.5;
+      if (customTrims.enzymeWash) trimAddon += 180;
+      if (customTrims.ykkZippers) trimAddon += 120;
+      if (customTrims.customLabels) trimAddon += 60;
+      if (customTrims.organicDye) trimAddon += 150;
 
-      const unitCost = ((baseCost + trimAddon) * volumeMultiplier).toFixed(2);
-      const totalCost = (Number(unitCost) * quantity).toFixed(2);
+      const unitCost = Math.round((baseCost + trimAddon) * volumeMultiplier);
+      const totalCost = unitCost * quantity;
       const leadTimeDays = quantity > 5000 ? 16 : quantity > 2000 ? 12 : 9;
 
       setEstimateResult({
@@ -73,13 +77,13 @@ export default function AiEstimator() {
         leadTimeDays,
         destination,
         breakdown: {
-          fabric: (unitCost * 0.52).toFixed(2),
-          sewing: (unitCost * 0.24).toFixed(2),
-          washing: (unitCost * 0.12).toFixed(2),
-          trimsPacking: (unitCost * 0.12).toFixed(2),
+          fabric: Math.round(unitCost * 0.52),
+          sewing: Math.round(unitCost * 0.24),
+          washing: Math.round(unitCost * 0.12),
+          trimsPacking: Math.round(unitCost * 0.12),
         },
         ecoScore: customTrims.organicDye ? 'A+ (GOTS Zero Carbon)' : 'A (OEKO-TEX Certified)',
-        estimatedRetailPrice: (unitCost * 3.4).toFixed(2),
+        estimatedRetailPrice: Math.round(unitCost * 2.8),
         potentialGrossMargin: '68%'
       });
 
@@ -88,7 +92,7 @@ export default function AiEstimator() {
       Swal.fire({
         icon: 'success',
         title: 'AI Production Estimate Generated!',
-        text: `FOB Unit Cost calculated at $${unitCost} USD for ${quantity.toLocaleString()} units.`,
+        text: `FOB Unit Cost calculated at ৳${Number(unitCost).toLocaleString()} BDT for ${quantity.toLocaleString()} units.`,
         timer: 2000,
         showConfirmButton: false
       });
@@ -286,9 +290,15 @@ export default function AiEstimator() {
             >
               <div className="flex items-center justify-between border-b border-gray-100 dark:border-slate-800 pb-4">
                 <div>
-                  <span className="text-[10px] font-black uppercase tracking-wider text-emerald-600 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-950 px-2 py-0.5 rounded-md">
-                    Verified AI Quotation
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-black uppercase tracking-wider text-emerald-600 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-950 px-2 py-0.5 rounded-md">
+                      Verified AI Quotation
+                    </span>
+                    <span className="text-[11px] text-gray-500 dark:text-gray-400 font-semibold flex items-center gap-1">
+                      <User className="w-3 h-3 text-emerald-500" />
+                      Prepared for: <strong className="text-gray-900 dark:text-white">{clientName}</strong>
+                    </span>
+                  </div>
                   <h3 className="text-xl font-black text-gray-900 dark:text-white font-heading mt-1">
                     {estimateResult.category} Wholesale Breakdown
                   </h3>
@@ -311,9 +321,9 @@ export default function AiEstimator() {
                     FOB Unit Price
                   </span>
                   <div className="text-3xl sm:text-4xl font-black font-heading text-white">
-                    ${estimateResult.unitCost}
+                    ৳{Number(estimateResult.unitCost).toLocaleString()}
                   </div>
-                  <span className="text-[10px] text-slate-400">USD / Piece</span>
+                  <span className="text-[10px] text-slate-400">BDT / Piece</span>
                 </div>
 
                 <div className="space-y-1 border-l border-slate-800 pl-4">
@@ -321,7 +331,7 @@ export default function AiEstimator() {
                     Total Order Value
                   </span>
                   <div className="text-2xl sm:text-3xl font-black font-heading text-white">
-                    ${Number(estimateResult.totalCost).toLocaleString()}
+                    ৳{Number(estimateResult.totalCost).toLocaleString()}
                   </div>
                   <span className="text-[10px] text-emerald-400">For {estimateResult.quantity.toLocaleString()} units</span>
                 </div>
@@ -335,19 +345,19 @@ export default function AiEstimator() {
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
                   <div className="p-3 bg-gray-50 dark:bg-slate-800/60 rounded-xl">
                     <span className="text-gray-400 block text-[10px]">Fabric & Yarn</span>
-                    <strong className="text-sm text-gray-900 dark:text-white">${estimateResult.breakdown.fabric}</strong>
+                    <strong className="text-sm text-gray-900 dark:text-white">৳{Number(estimateResult.breakdown.fabric).toLocaleString()}</strong>
                   </div>
                   <div className="p-3 bg-gray-50 dark:bg-slate-800/60 rounded-xl">
                     <span className="text-gray-400 block text-[10px]">Stitching CM</span>
-                    <strong className="text-sm text-gray-900 dark:text-white">${estimateResult.breakdown.sewing}</strong>
+                    <strong className="text-sm text-gray-900 dark:text-white">৳{Number(estimateResult.breakdown.sewing).toLocaleString()}</strong>
                   </div>
                   <div className="p-3 bg-gray-50 dark:bg-slate-800/60 rounded-xl">
                     <span className="text-gray-400 block text-[10px]">Washes & Dyes</span>
-                    <strong className="text-sm text-gray-900 dark:text-white">${estimateResult.breakdown.washing}</strong>
+                    <strong className="text-sm text-gray-900 dark:text-white">৳{Number(estimateResult.breakdown.washing).toLocaleString()}</strong>
                   </div>
                   <div className="p-3 bg-gray-50 dark:bg-slate-800/60 rounded-xl">
                     <span className="text-gray-400 block text-[10px]">Trims & Packing</span>
-                    <strong className="text-sm text-gray-900 dark:text-white">${estimateResult.breakdown.trimsPacking}</strong>
+                    <strong className="text-sm text-gray-900 dark:text-white">৳{Number(estimateResult.breakdown.trimsPacking).toLocaleString()}</strong>
                   </div>
                 </div>
               </div>
@@ -374,7 +384,7 @@ export default function AiEstimator() {
               <div className="p-4 bg-gray-50 dark:bg-slate-800/60 rounded-2xl flex items-center justify-between text-xs">
                 <div>
                   <span className="text-gray-400 block text-[10px]">Projected Retail Shelf MSRP</span>
-                  <strong className="text-base text-gray-900 dark:text-white">${estimateResult.estimatedRetailPrice} USD</strong>
+                  <strong className="text-base text-gray-900 dark:text-white">৳{Number(estimateResult.estimatedRetailPrice).toLocaleString()} BDT</strong>
                 </div>
                 <div className="text-right">
                   <span className="text-gray-400 block text-[10px]">Buyer Gross Profit Margin</span>

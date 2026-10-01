@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react';
+import { Link } from 'react-router';
 import Swal from 'sweetalert2';
-import { Clock, CheckCircle2, XCircle, Eye, AlertCircle, X, MapPin } from 'lucide-react';
+import { Clock, CheckCircle2, XCircle, Eye, AlertCircle, X, MapPin, MessageSquare } from 'lucide-react';
 import { AuthContext } from '../../../AuthProvider/authProvider';
 import api from '../../../api/api';
 import usePageTitle from '../../../Shared/usePageTitle';
@@ -67,13 +68,42 @@ export default function PendingOrders() {
         });
 
         if (res.data?.success) {
-          Swal.fire({
-            icon: 'success',
-            title: `Order ${newStatus}`,
-            text: `Order status changed to ${newStatus} successfully!`,
-            timer: 2000,
-            showConfirmButton: false
-          });
+          const targetOrder = orders.find(o => String(o._id) === String(orderId)) || {};
+          const wpText = encodeURIComponent(
+            `🏭 *GarmentsTracker Production Confirmed!*\n\n` +
+            `📋 *Order ID:* #${String(orderId).slice(-6)}\n` +
+            `👕 *Product:* ${targetOrder.productTitle || 'Apparel Style'}\n` +
+            `📦 *Quantity:* ${targetOrder.quantity || 100} units (৳${Number(targetOrder.totalPrice || 0).toLocaleString()} BDT)\n` +
+            `🏢 *Buyer:* ${targetOrder.userName || targetOrder.userEmail || 'Wholesale Buyer'}\n` +
+            `👔 *Manager:* ${user?.displayName || dbUser?.name || user?.email}\n` +
+            `⏱️ *Status:* Production Line Scheduled & Approved\n` +
+            `🔗 *Live System View:* http://localhost:5173/dashboard/all-orders`
+          );
+
+          if (newStatus === 'Approved') {
+            Swal.fire({
+              icon: 'success',
+              title: 'Production Confirmed & Scheduled!',
+              html: `<p class="text-sm text-gray-600 dark:text-gray-300 mb-2">Order has been approved for factory assembly.</p><p class="text-xs text-gray-500 dark:text-gray-400">Would you like to send an instant <strong>WhatsApp Alert to the Admin</strong>?</p>`,
+              showCancelButton: true,
+              confirmButtonText: '📲 Send WhatsApp Alert to Admin',
+              cancelButtonText: 'Done',
+              confirmButtonColor: '#25D366',
+              cancelButtonColor: '#64748b'
+            }).then((result) => {
+              if (result.isConfirmed) {
+                window.open(`https://wa.me/?text=${wpText}`, '_blank');
+              }
+            });
+          } else {
+            Swal.fire({
+              icon: 'success',
+              title: `Order ${newStatus}`,
+              text: `Order status changed to ${newStatus} successfully!`,
+              timer: 2000,
+              showConfirmButton: false
+            });
+          }
           fetchPendingOrders();
         }
       } catch (err) {
@@ -168,7 +198,7 @@ export default function PendingOrders() {
 
                     {/* Quantity */}
                     <td className="py-4 px-6 font-bold text-gray-900 dark:text-white">
-                      {ord.quantity} pcs (${ord.totalPrice})
+                      {ord.quantity} pcs (৳{Number(ord.totalPrice || 0).toLocaleString()})
                     </td>
 
                     {/* Date */}
@@ -179,6 +209,14 @@ export default function PendingOrders() {
                     {/* Actions */}
                     <td className="py-4 px-6 text-right">
                       <div className="flex items-center justify-end gap-2">
+                        <Link
+                          to={`/dashboard/chat?email=${encodeURIComponent(ord.userEmail)}&orderId=${ord._id}`}
+                          className="p-2 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-600 hover:text-white text-indigo-600 dark:text-indigo-400 transition-colors"
+                          title="In-App Live Chat with Buyer"
+                        >
+                          <MessageSquare className="w-4 h-4" />
+                        </Link>
+
                         <button
                           onClick={() => {
                             setSelectedOrder(ord);
@@ -247,7 +285,7 @@ export default function PendingOrders() {
                 </div>
                 <div className="p-3 bg-gray-50 dark:bg-slate-800/60 rounded-xl">
                   <span className="text-gray-400 font-bold block">Calculated Total</span>
-                  <strong className="text-sm text-emerald-600 dark:text-emerald-400">${selectedOrder.totalPrice}</strong>
+                  <strong className="text-sm text-emerald-600 dark:text-emerald-400">৳{Number(selectedOrder.totalPrice || 0).toLocaleString()} BDT</strong>
                 </div>
               </div>
 
@@ -264,13 +302,20 @@ export default function PendingOrders() {
               )}
             </div>
 
-            <div className="pt-2 flex justify-end gap-2">
+            <div className="pt-2 flex justify-end items-center gap-2">
               <button
                 onClick={() => setIsViewOpen(false)}
-                className="px-4 py-2 rounded-xl text-xs font-semibold text-gray-500"
+                className="px-4 py-2 rounded-xl text-xs font-semibold text-gray-500 hover:bg-gray-100 dark:hover:bg-slate-800"
               >
                 Close
               </button>
+              <Link
+                to={`/dashboard/chat?email=${encodeURIComponent(selectedOrder.userEmail)}&orderId=${selectedOrder._id}`}
+                className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold flex items-center gap-1.5 transition-all shadow-xs"
+              >
+                <MessageSquare className="w-3.5 h-3.5" />
+                <span>Chat with Buyer</span>
+              </Link>
               <button
                 disabled={isSuspended}
                 onClick={() => {

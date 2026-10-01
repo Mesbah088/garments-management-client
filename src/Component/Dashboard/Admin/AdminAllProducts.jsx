@@ -230,7 +230,7 @@ export default function AdminAllProducts() {
 
                     {/* Price */}
                     <td className="py-4 px-6 font-bold text-emerald-600 dark:text-emerald-400">
-                      ${Number(prod.price).toFixed(2)}
+                      ৳{Number(prod.price).toLocaleString()}
                     </td>
 
                     {/* Category */}
@@ -335,7 +335,7 @@ export default function AdminAllProducts() {
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-bold text-gray-700 dark:text-gray-300">Price ($ USD) *</label>
+                  <label className="text-xs font-bold text-gray-700 dark:text-gray-300">Price (৳ BDT) *</label>
                   <input
                     type="number"
                     step="0.01"

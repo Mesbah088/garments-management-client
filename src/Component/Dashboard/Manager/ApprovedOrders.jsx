@@ -1,4 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
+import { Link } from 'react-router';
 import Swal from 'sweetalert2';
 import { 
   CheckCircle2, 
@@ -9,7 +10,8 @@ import {
   Layers, 
   X, 
   Calendar,
-  AlertCircle
+  AlertCircle,
+  MessageSquare
 } from 'lucide-react';
 import { AuthContext } from '../../../AuthProvider/authProvider';
 import api from '../../../api/api';
@@ -100,12 +102,29 @@ export default function ApprovedOrders() {
       const res = await api.post(`/orders/${selectedOrder._id}/tracking`, payload);
       if (res.data?.success) {
         setIsAddTrackingOpen(false);
+        const wpMsg = encodeURIComponent(
+          `🏭 *GarmentsTracker Production Milestone Update!*\n\n` +
+          `📋 *Order ID:* #${String(selectedOrder._id).slice(-6)}\n` +
+          `👕 *Product:* ${selectedOrder.productTitle}\n` +
+          `📍 *New Milestone:* ${trackingStage}\n` +
+          `🏢 *Location:* ${trackingLocation}\n` +
+          `📝 *Note:* ${trackingNote || 'Standard QA inspection passed.'}\n` +
+          `🔗 *Live Tracking:* http://localhost:5173/dashboard/track-order/${selectedOrder._id}`
+        );
+
         Swal.fire({
           icon: 'success',
           title: 'Tracking Stage Logged!',
-          text: `"${trackingStage}" registered to order timeline.`,
-          timer: 2000,
-          showConfirmButton: false
+          html: `<p class="text-sm text-gray-600 dark:text-gray-300 mb-2">Stage <strong>${trackingStage}</strong> recorded successfully.</p><p class="text-xs text-gray-500 dark:text-gray-400">Would you like to send an instant <strong>WhatsApp Progress Alert</strong> to the Admin & Buyer?</p>`,
+          showCancelButton: true,
+          confirmButtonText: '📲 Send WhatsApp Alert',
+          cancelButtonText: 'Close',
+          confirmButtonColor: '#25D366',
+          cancelButtonColor: '#64748b'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            window.open(`https://wa.me/?text=${wpMsg}`, '_blank');
+          }
         });
         fetchApprovedOrders();
       }
@@ -202,7 +221,7 @@ export default function ApprovedOrders() {
 
                     {/* Quantity */}
                     <td className="py-4 px-6 font-bold text-gray-900 dark:text-white">
-                      {ord.quantity} pcs (${ord.totalPrice})
+                      {ord.quantity} pcs (৳{Number(ord.totalPrice || 0).toLocaleString()})
                     </td>
 
                     {/* Approved Date */}
@@ -213,6 +232,15 @@ export default function ApprovedOrders() {
                     {/* Actions */}
                     <td className="py-4 px-6 text-right">
                       <div className="flex items-center justify-end gap-2">
+                        {/* In-App Live Chat with Buyer */}
+                        <Link
+                          to={`/dashboard/chat?email=${encodeURIComponent(ord.userEmail)}&orderId=${ord._id}`}
+                          className="p-1.5 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-600 hover:text-white text-indigo-600 dark:text-indigo-400 transition-colors"
+                          title="In-App Live Chat with Buyer"
+                        >
+                          <MessageSquare className="w-4 h-4" />
+                        </Link>
+
                         <button
                           onClick={() => openViewTracking(ord)}
                           className="px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-slate-800 hover:bg-gray-200 dark:hover:bg-slate-700 text-gray-700 dark:text-gray-300 font-semibold text-xs transition-colors inline-flex items-center gap-1.5"
@@ -228,6 +256,26 @@ export default function ApprovedOrders() {
                         >
                           <Plus className="w-3.5 h-3.5" />
                           Add Tracking
+                        </button>
+
+                        <button
+                          onClick={() => {
+                            const latestTrack = ord.tracking?.[ord.tracking.length - 1] || {};
+                            const wpMsg = encodeURIComponent(
+                              `🏭 *GarmentsTracker Production Status Alert*\n\n` +
+                              `📋 *Order ID:* #${String(ord._id).slice(-6)}\n` +
+                              `👕 *Product:* ${ord.productTitle}\n` +
+                              `📦 *Quantity:* ${ord.quantity} units (৳${Number(ord.totalPrice || 0).toLocaleString()} BDT)\n` +
+                              `📍 *Latest Milestone:* ${latestTrack.step || 'Production Scheduled'}\n` +
+                              `🏢 *Location:* ${latestTrack.location || 'Factory Floor'}\n` +
+                              `🔗 *Live Tracking:* http://localhost:5173/dashboard/track-order/${ord._id}`
+                            );
+                            window.open(`https://wa.me/?text=${wpMsg}`, '_blank');
+                          }}
+                          title="Send WhatsApp Alert to Admin & Buyer"
+                          className="p-1.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-600 hover:text-white transition-colors"
+                        >
+                          <MessageSquare className="w-4 h-4" />
                         </button>
                       </div>
                     </td>

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router';
 import { motion } from 'framer-motion';
+import Swal from 'sweetalert2';
 import { 
   Truck, 
   MapPin, 
@@ -12,7 +13,11 @@ import {
   Package, 
   ArrowLeft,
   Navigation,
-  Factory
+  Factory,
+  MessageSquare,
+  Send,
+  UserCheck,
+  Sparkles
 } from 'lucide-react';
 import api from '../../../api/api';
 import usePageTitle from '../../../Shared/usePageTitle';
@@ -22,25 +27,59 @@ export default function TrackOrder() {
   const { orderId } = useParams();
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [buyerKnockNote, setBuyerKnockNote] = useState('');
+  const [sendingNote, setSendingNote] = useState(false);
 
   usePageTitle('Live Order Tracking');
 
-  useEffect(() => {
-    const fetchOrder = async () => {
-      try {
-        const res = await api.get(`/orders/${orderId}`);
-        setOrder(res.data);
-      } catch (err) {
-        console.error('Failed to load tracking details:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchOrder = async () => {
+    try {
+      const res = await api.get(`/orders/${orderId}`);
+      setOrder(res.data);
+    } catch (err) {
+      console.error('Failed to load tracking details:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     if (orderId) {
       fetchOrder();
     }
   }, [orderId]);
+
+  const handleSendKnockNote = async (e) => {
+    e.preventDefault();
+    if (!buyerKnockNote.trim()) return;
+
+    setSendingNote(true);
+    try {
+      const payload = {
+        step: 'Buyer Inquiry / Customization Knock',
+        location: 'Buyer Account Portal',
+        note: buyerKnockNote.trim(),
+        timestamp: new Date().toISOString()
+      };
+
+      const res = await api.post(`/orders/${orderId}/tracking`, payload);
+      if (res.data?.success) {
+        setBuyerKnockNote('');
+        Swal.fire({
+          icon: 'success',
+          title: 'Knock Note Logged to Timeline!',
+          text: 'Your production note has been recorded and sent to the manager.',
+          timer: 2000,
+          showConfirmButton: false
+        });
+        fetchOrder();
+      }
+    } catch (err) {
+      Swal.fire('Error', err.response?.data?.message || err.message, 'error');
+    } finally {
+      setSendingNote(false);
+    }
+  };
 
   if (loading) {
     return <LoadingSpinner text="Retrieving real-time production telemetry..." />;
@@ -100,7 +139,7 @@ export default function TrackOrder() {
               {order.productTitle}
             </h4>
             <span className="text-[11px] text-emerald-600 dark:text-emerald-400 font-extrabold">
-              {order.quantity} units • ${order.totalPrice}
+              {order.quantity} units • ৳{Number(order.totalPrice || 0).toLocaleString()} BDT
             </span>
           </div>
         </div>
@@ -253,6 +292,91 @@ export default function TrackOrder() {
               <p className="font-semibold text-gray-800 dark:text-gray-200">{order.deliveryAddress}</p>
               <p className="text-gray-400">Recipient Contact: {order.contactNumber}</p>
             </div>
+          </div>
+
+          {/* 💬 KNOCK PRODUCTION MANAGER SECTION */}
+          <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-emerald-200/80 dark:border-slate-800 shadow-sm space-y-4">
+            <div className="flex items-center justify-between border-b border-gray-100 dark:border-slate-800 pb-3">
+              <div className="flex items-center gap-2">
+                <div className="p-2 rounded-xl bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400">
+                  <MessageSquare className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-gray-900 dark:text-white font-heading">
+                    Knock Production Manager
+                  </h3>
+                  <p className="text-[10px] text-gray-400">Direct factory line inquiries & customization notes</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Assigned Manager Card */}
+            <div className="p-3.5 bg-gray-50 dark:bg-slate-800/60 rounded-2xl flex items-center justify-between gap-3 text-xs">
+              <div className="flex items-center gap-2.5">
+                <img
+                  src="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=100&q=80"
+                  alt="Production Head"
+                  className="w-9 h-9 rounded-full object-cover ring-2 ring-emerald-500/30"
+                />
+                <div>
+                  <h4 className="font-bold text-gray-900 dark:text-white text-xs">
+                    Tariqul Production Head
+                  </h4>
+                  <span className="text-[10px] text-gray-400 block">
+                    Assigned Floor Supervisor
+                  </span>
+                </div>
+              </div>
+
+              {/* Action Buttons: In-App Chat & WhatsApp */}
+              <div className="flex items-center gap-2">
+                <Link
+                  to={`/dashboard/chat?email=manager@garmentstracker.com&orderId=${order._id}`}
+                  className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-1.5 transition-all shadow-xs"
+                >
+                  <MessageSquare className="w-3.5 h-3.5" />
+                  <span>In-App Chat</span>
+                </Link>
+                <button
+                  onClick={() => {
+                    const wpText = encodeURIComponent(
+                      `👋 *Hello Production Manager,*\n\n` +
+                      `I am the buyer for Order *#${String(order._id).slice(-6)}* (${order.productTitle}, ${order.quantity} pcs).\n\n` +
+                      `Could you please share an update or assist with our production schedule?\n\n` +
+                      `🔗 *Tracking ID:* http://localhost:5173/dashboard/track-order/${order._id}`
+                    );
+                    window.open(`https://wa.me/?text=${wpText}`, '_blank');
+                  }}
+                  className="px-3 py-1.5 rounded-xl bg-[#25D366] hover:bg-[#1ebd5a] text-white font-bold text-xs flex items-center gap-1.5 transition-all shadow-xs"
+                >
+                  <span>WhatsApp</span>
+                </button>
+              </div>
+            </div>
+
+            {/* In-App Production Knock Form */}
+            <form onSubmit={handleSendKnockNote} className="space-y-2 pt-1">
+              <label className="text-[11px] font-bold text-gray-700 dark:text-gray-300 block">
+                Post Live Instruction Note to Floor:
+              </label>
+              <div className="relative">
+                <textarea
+                  rows="2"
+                  value={buyerKnockNote}
+                  onChange={(e) => setBuyerKnockNote(e.target.value)}
+                  placeholder="e.g. Please verify collar button quality before dispatch..."
+                  className="w-full px-3 py-2 text-xs bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-hidden focus:ring-2 focus:ring-emerald-500"
+                />
+              </div>
+              <button
+                type="submit"
+                disabled={sendingNote || !buyerKnockNote.trim()}
+                className="w-full py-2 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-40 text-white rounded-xl text-xs font-bold transition-colors flex items-center justify-center gap-1.5 shadow-2xs"
+              >
+                <Send className="w-3.5 h-3.5" />
+                <span>{sendingNote ? 'Submitting Note...' : 'Send Note to Manager'}</span>
+              </button>
+            </form>
           </div>
 
         </div>

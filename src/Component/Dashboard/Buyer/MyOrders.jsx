@@ -12,7 +12,8 @@ import {
   CreditCard, 
   Banknote,
   MapPin,
-  X
+  X,
+  MessageSquare
 } from 'lucide-react';
 import { AuthContext } from '../../../AuthProvider/authProvider';
 import api from '../../../api/api';
@@ -166,7 +167,7 @@ export default function MyOrders() {
                     {/* Quantity */}
                     <td className="py-4 px-6">
                       <strong className="font-bold text-gray-900 dark:text-white block">{ord.quantity} pcs</strong>
-                      <span className="text-xs text-emerald-600 dark:text-emerald-400 font-extrabold">${ord.totalPrice}</span>
+                      <span className="text-xs text-emerald-600 dark:text-emerald-400 font-extrabold">৳{Number(ord.totalPrice).toLocaleString()}</span>
                     </td>
 
                     {/* Status */}
@@ -199,6 +200,32 @@ export default function MyOrders() {
                     {/* Actions */}
                     <td className="py-4 px-6 text-right">
                       <div className="flex items-center justify-end gap-2">
+                        {/* In-App Live Chat Button */}
+                        <Link
+                          to={`/dashboard/chat?email=manager@garmentstracker.com&orderId=${ord._id}`}
+                          className="p-1.5 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-600 hover:text-white text-indigo-600 dark:text-indigo-400 transition-colors"
+                          title="In-App Live Chat with Manager"
+                        >
+                          <MessageSquare className="w-4 h-4" />
+                        </Link>
+
+                        {/* WhatsApp Knock Button */}
+                        <button
+                          onClick={() => {
+                            const wpText = encodeURIComponent(
+                              `👋 *Hello Production Manager,*\n\n` +
+                              `I am the buyer for Order *#${String(ord._id).slice(-6)}* (${ord.productTitle}, ${ord.quantity} pcs).\n\n` +
+                              `Could you please share an update or confirm my order customization instructions?\n\n` +
+                              `🔗 *Order Details:* http://localhost:5173/dashboard/track-order/${ord._id}`
+                            );
+                            window.open(`https://wa.me/?text=${wpText}`, '_blank');
+                          }}
+                          className="p-1.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 hover:bg-[#25D366] hover:text-white text-emerald-600 dark:text-emerald-400 transition-colors"
+                          title="Knock Manager on WhatsApp"
+                        >
+                          <Phone className="w-4 h-4" />
+                        </button>
+
                         {/* Track Order Button */}
                         <Link
                           to={`/dashboard/track-order/${ord._id}`}
@@ -265,7 +292,7 @@ export default function MyOrders() {
             <div className="space-y-3 text-xs">
               <div className="p-3 bg-gray-50 dark:bg-slate-800/60 rounded-xl space-y-1">
                 <strong className="block text-sm text-gray-900 dark:text-white">{selectedOrder.productTitle}</strong>
-                <p className="text-emerald-600 font-semibold">{selectedOrder.quantity} units • ${selectedOrder.totalPrice} USD</p>
+                <p className="text-emerald-600 font-semibold">{selectedOrder.quantity} units • ৳{Number(selectedOrder.totalPrice).toLocaleString()} BDT</p>
               </div>
 
               <div className="p-3 bg-gray-50 dark:bg-slate-800/60 rounded-xl">
@@ -281,16 +308,41 @@ export default function MyOrders() {
               )}
             </div>
 
-            <div className="pt-2 flex justify-between items-center">
-              <Link
-                to={`/dashboard/track-order/${selectedOrder._id}`}
-                className="px-4 py-2 bg-emerald-600 text-white rounded-xl text-xs font-bold hover:bg-emerald-700 flex items-center gap-1.5"
-              >
-                <Truck className="w-3.5 h-3.5" /> Open Full Timeline
-              </Link>
+            <div className="pt-2 flex flex-wrap justify-between items-center gap-2">
+              <div className="flex items-center gap-2">
+                <Link
+                  to={`/dashboard/track-order/${selectedOrder._id}`}
+                  className="px-4 py-2 bg-emerald-600 text-white rounded-xl text-xs font-bold hover:bg-emerald-700 flex items-center gap-1.5 shadow-2xs"
+                >
+                  <Truck className="w-3.5 h-3.5" /> Open Full Timeline
+                </Link>
+
+                <Link
+                  to={`/dashboard/chat?email=manager@garmentstracker.com&orderId=${selectedOrder._id}`}
+                  className="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-2xs transition-colors"
+                >
+                  <MessageSquare className="w-3.5 h-3.5" /> In-App Chat
+                </Link>
+
+                <button
+                  onClick={() => {
+                    const wpText = encodeURIComponent(
+                      `👋 *Hello Production Manager,*\n\n` +
+                      `I am the buyer for Order *#${String(selectedOrder._id).slice(-6)}* (${selectedOrder.productTitle}, ${selectedOrder.quantity} pcs).\n\n` +
+                      `Could you please share an update or assist with our production schedule?\n\n` +
+                      `🔗 *Order Details:* http://localhost:5173/dashboard/track-order/${selectedOrder._id}`
+                    );
+                    window.open(`https://wa.me/?text=${wpText}`, '_blank');
+                  }}
+                  className="px-3.5 py-2 bg-[#25D366] hover:bg-[#1ebd5a] text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-2xs transition-colors"
+                >
+                  <Phone className="w-3.5 h-3.5" /> Knock on WhatsApp
+                </button>
+              </div>
+
               <button
                 onClick={() => setIsViewOpen(false)}
-                className="px-4 py-2 rounded-xl bg-gray-900 text-white text-xs font-bold"
+                className="px-4 py-2 rounded-xl bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 text-xs font-bold transition-colors"
               >
                 Close
               </button>

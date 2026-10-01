@@ -18,6 +18,7 @@ import Register from "../Component/Pages/Register";
 // Dashboard Shared & Index
 import DashboardIndex from "../Component/Dashboard/DashboardIndex";
 import Profile from "../Component/Dashboard/Profile";
+import ChatHub from "../Component/Dashboard/Chat/ChatHub";
 
 // Dashboard Admin Pages
 import AdminDashboard from "../Component/Dashboard/Admin/AdminDashboard";
@@ -30,6 +31,7 @@ import AddProduct from "../Component/Dashboard/Manager/AddProduct";
 import ManageProducts from "../Component/Dashboard/Manager/ManageProducts";
 import PendingOrders from "../Component/Dashboard/Manager/PendingOrders";
 import ApprovedOrders from "../Component/Dashboard/Manager/ApprovedOrders";
+import ManagerAnalytics from "../Component/Dashboard/Manager/ManagerAnalytics";
 
 // Dashboard Buyer Pages
 import MyOrders from "../Component/Dashboard/Buyer/MyOrders";
@@ -155,6 +157,22 @@ export const router = createBrowserRouter([
 
       // Manager Private Routes
       {
+        path: "financials",
+        element: (
+          <ManagerRoute>
+            <ManagerAnalytics />
+          </ManagerRoute>
+        )
+      },
+      {
+        path: "manager-analytics",
+        element: (
+          <ManagerRoute>
+            <ManagerAnalytics />
+          </ManagerRoute>
+        )
+      },
+      {
         path: "add-product",
         element: (
           <ManagerRoute>
@@ -201,6 +219,24 @@ export const router = createBrowserRouter([
         element: (
           <PrivateRoute>
             <TrackOrder />
+          </PrivateRoute>
+        )
+      },
+
+      // Shared Chat Hub & Messages
+      {
+        path: "chat",
+        element: (
+          <PrivateRoute>
+            <ChatHub />
+          </PrivateRoute>
+        )
+      },
+      {
+        path: "messages",
+        element: (
+          <PrivateRoute>
+            <ChatHub />
           </PrivateRoute>
         )
       },
