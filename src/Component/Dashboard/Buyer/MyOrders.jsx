@@ -216,7 +216,7 @@ export default function MyOrders() {
                               `👋 *Hello Production Manager,*\n\n` +
                               `I am the buyer for Order *#${String(ord._id).slice(-6)}* (${ord.productTitle}, ${ord.quantity} pcs).\n\n` +
                               `Could you please share an update or confirm my order customization instructions?\n\n` +
-                              `🔗 *Order Details:* http://localhost:5173/dashboard/track-order/${ord._id}`
+                              `🔗 *Order Details:* ${typeof window !== 'undefined' ? window.location.origin : 'https://garments-tracker-app.web.app'}/dashboard/track-order/${ord._id}`
                             );
                             window.open(`https://wa.me/?text=${wpText}`, '_blank');
                           }}
@@ -330,7 +330,7 @@ export default function MyOrders() {
                       `👋 *Hello Production Manager,*\n\n` +
                       `I am the buyer for Order *#${String(selectedOrder._id).slice(-6)}* (${selectedOrder.productTitle}, ${selectedOrder.quantity} pcs).\n\n` +
                       `Could you please share an update or assist with our production schedule?\n\n` +
-                      `🔗 *Order Details:* http://localhost:5173/dashboard/track-order/${selectedOrder._id}`
+                      `🔗 *Order Details:* ${typeof window !== 'undefined' ? window.location.origin : 'https://garments-tracker-app.web.app'}/dashboard/track-order/${selectedOrder._id}`
                     );
                     window.open(`https://wa.me/?text=${wpText}`, '_blank');
                   }}

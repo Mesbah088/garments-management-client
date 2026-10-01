@@ -77,7 +77,7 @@ export default function PendingOrders() {
             `🏢 *Buyer:* ${targetOrder.userName || targetOrder.userEmail || 'Wholesale Buyer'}\n` +
             `👔 *Manager:* ${user?.displayName || dbUser?.name || user?.email}\n` +
             `⏱️ *Status:* Production Line Scheduled & Approved\n` +
-            `🔗 *Live System View:* http://localhost:5173/dashboard/all-orders`
+            `🔗 *Live System View:* ${typeof window !== 'undefined' ? window.location.origin : 'https://garments-tracker-app.web.app'}/dashboard/all-orders`
           );
 
           if (newStatus === 'Approved') {

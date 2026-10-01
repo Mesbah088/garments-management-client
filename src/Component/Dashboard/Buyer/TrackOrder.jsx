@@ -343,7 +343,7 @@ export default function TrackOrder() {
                       `👋 *Hello Production Manager,*\n\n` +
                       `I am the buyer for Order *#${String(order._id).slice(-6)}* (${order.productTitle}, ${order.quantity} pcs).\n\n` +
                       `Could you please share an update or assist with our production schedule?\n\n` +
-                      `🔗 *Tracking ID:* http://localhost:5173/dashboard/track-order/${order._id}`
+                      `🔗 *Tracking ID:* ${typeof window !== 'undefined' ? window.location.origin : 'https://garments-tracker-app.web.app'}/dashboard/track-order/${order._id}`
                     );
                     window.open(`https://wa.me/?text=${wpText}`, '_blank');
                   }}

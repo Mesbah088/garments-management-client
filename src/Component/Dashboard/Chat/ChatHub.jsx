@@ -16,6 +16,8 @@ import {
 } from 'lucide-react';
 import Swal from 'sweetalert2';
 
+import { getApiBaseUrl } from '../../../api/api';
+
 const Toast = Swal.mixin({
   toast: true,
   position: 'top-end',
@@ -24,7 +26,7 @@ const Toast = Swal.mixin({
   timerProgressBar: true
 });
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+const API_BASE = getApiBaseUrl();
 
 export default function ChatHub() {
   const { user, dbUser } = useContext(AuthContext);

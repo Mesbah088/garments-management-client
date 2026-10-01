@@ -109,7 +109,7 @@ export default function ApprovedOrders() {
           `📍 *New Milestone:* ${trackingStage}\n` +
           `🏢 *Location:* ${trackingLocation}\n` +
           `📝 *Note:* ${trackingNote || 'Standard QA inspection passed.'}\n` +
-          `🔗 *Live Tracking:* http://localhost:5173/dashboard/track-order/${selectedOrder._id}`
+          `🔗 *Live Tracking:* ${typeof window !== 'undefined' ? window.location.origin : 'https://garments-tracker-app.web.app'}/dashboard/track-order/${selectedOrder._id}`
         );
 
         Swal.fire({
@@ -268,7 +268,7 @@ export default function ApprovedOrders() {
                               `📦 *Quantity:* ${ord.quantity} units (৳${Number(ord.totalPrice || 0).toLocaleString()} BDT)\n` +
                               `📍 *Latest Milestone:* ${latestTrack.step || 'Production Scheduled'}\n` +
                               `🏢 *Location:* ${latestTrack.location || 'Factory Floor'}\n` +
-                              `🔗 *Live Tracking:* http://localhost:5173/dashboard/track-order/${ord._id}`
+                              `🔗 *Live Tracking:* ${typeof window !== 'undefined' ? window.location.origin : 'https://garments-tracker-app.web.app'}/dashboard/track-order/${ord._id}`
                             );
                             window.open(`https://wa.me/?text=${wpMsg}`, '_blank');
                           }}

@@ -27,6 +27,8 @@ import {
 } from 'lucide-react';
 import ThreadAiChatbot from '../AI/ThreadAiChatbot';
 
+import { api } from '../../api/api';
+
 export default function DashboardLayout() {
   const { user, dbUser, logOut } = useContext(AuthContext);
   const { theme, toggleTheme } = useTheme();
@@ -40,11 +42,9 @@ export default function DashboardLayout() {
       const email = user?.email || dbUser?.email;
       if (!email) return;
       try {
-        const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
-        const res = await fetch(`${baseUrl}/messages/unread-total?email=${encodeURIComponent(email)}`);
-        if (res.ok) {
-          const data = await res.json();
-          setUnreadCount(data.totalUnread || 0);
+        const res = await api.get(`/messages/unread-total?email=${encodeURIComponent(email)}`);
+        if (res.data) {
+          setUnreadCount(res.data.totalUnread || 0);
         }
       } catch (e) {
         // silent
