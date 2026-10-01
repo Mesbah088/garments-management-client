@@ -11,7 +11,7 @@ export const getApiBaseUrl = () => {
       if (envUrl && !envUrl.includes('localhost')) {
         return envUrl.replace(/\/+$/, '');
       }
-      return 'https://garments-tracker-server.vercel.app';
+      return 'https://garments-management-server-beta.vercel.app';
     }
   }
 
