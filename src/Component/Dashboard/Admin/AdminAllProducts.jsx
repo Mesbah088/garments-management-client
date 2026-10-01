@@ -58,7 +58,7 @@ export default function AdminAllProducts() {
         showOnHome: updatedStatus
       });
 
-      if (res.data?.success) {
+      if (res.data?.success || res.data?.modifiedCount || res.data?.acknowledged || res.status === 200) {
         setProducts(prev => prev.map(p => p._id === product._id ? { ...p, showOnHome: updatedStatus } : p));
         Swal.fire({
           icon: 'success',
@@ -89,7 +89,7 @@ export default function AdminAllProducts() {
     if (result.isConfirmed) {
       try {
         const res = await api.delete(`/products/${product._id}`);
-        if (res.data?.success) {
+        if (res.data?.success || res.data?.deletedCount || res.data?.acknowledged || res.status === 200) {
           Swal.fire('Deleted!', 'Product removed successfully.', 'success');
           fetchProducts();
         }
@@ -135,7 +135,7 @@ export default function AdminAllProducts() {
       };
 
       const res = await api.put(`/products/${editingProduct._id}`, payload);
-      if (res.data?.success) {
+      if (res.data?.success || res.data?.modifiedCount || res.data?.acknowledged || res.status === 200) {
         setIsEditModalOpen(false);
         Swal.fire({
           icon: 'success',

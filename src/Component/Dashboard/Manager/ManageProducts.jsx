@@ -93,7 +93,7 @@ export default function ManageProducts() {
       };
 
       const res = await api.put(`/products/${editingProduct._id}`, payload);
-      if (res.data?.success) {
+      if (res.data?.success || res.data?.modifiedCount || res.data?.acknowledged || res.status === 200) {
         setIsEditOpen(false);
         Swal.fire('Updated!', 'Product updated successfully.', 'success');
         fetchProducts();

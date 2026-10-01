@@ -139,7 +139,7 @@ export default function ProductDetails() {
     setSubmitting(true);
     try {
       const res = await api.post('/orders', payload);
-      if (res.data?.success) {
+      if (res.data?.success || res.data?.insertedId || res.data?.acknowledged || res.status === 200 || res.status === 201) {
         setIsBookingOpen(false);
         setIsPaymentStep(false);
         Swal.fire({

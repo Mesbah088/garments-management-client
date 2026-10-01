@@ -66,7 +66,7 @@ export default function MyOrders() {
     if (confirm.isConfirmed) {
       try {
         const res = await api.patch(`/orders/${order._id}/cancel`, {});
-        if (res.data?.success) {
+        if (res.data?.success || res.data?.modifiedCount || res.data?.acknowledged || res.status === 200) {
           Swal.fire({
             icon: 'success',
             title: 'Order Cancelled',

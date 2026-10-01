@@ -100,7 +100,7 @@ export default function ApprovedOrders() {
       };
 
       const res = await api.post(`/orders/${selectedOrder._id}/tracking`, payload);
-      if (res.data?.success) {
+      if (res.data?.success || res.data?.modifiedCount || res.data?.acknowledged || res.status === 200) {
         setIsAddTrackingOpen(false);
         const wpMsg = encodeURIComponent(
           `🏭 *GarmentsTracker Production Milestone Update!*\n\n` +

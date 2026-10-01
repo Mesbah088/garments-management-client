@@ -67,7 +67,7 @@ export default function PendingOrders() {
           managerEmail: user?.email
         });
 
-        if (res.data?.success) {
+        if (res.data?.success || res.data?.modifiedCount || res.data?.acknowledged || res.status === 200) {
           const targetOrder = orders.find(o => String(o._id) === String(orderId)) || {};
           const wpText = encodeURIComponent(
             `🏭 *GarmentsTracker Production Confirmed!*\n\n` +

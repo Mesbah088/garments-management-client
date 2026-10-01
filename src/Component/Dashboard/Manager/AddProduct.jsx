@@ -104,7 +104,7 @@ export default function AddProduct() {
       };
 
       const res = await api.post('/products', payload);
-      if (res.data?.success) {
+      if (res.data?.success || res.data?.insertedId || res.data?.acknowledged || res.status === 200 || res.status === 201) {
         Swal.fire({
           icon: 'success',
           title: 'Product Published!',
@@ -117,7 +117,7 @@ export default function AddProduct() {
     } catch (err) {
       const errorMsg = err.response?.data?.message || 
         (err.code === 'ERR_NETWORK' 
-          ? 'Network Error: Unable to reach the server. Please ensure the backend server is running on port 5000.' 
+          ? 'Network Error: Unable to reach the server. Please ensure the backend server is running or reachable.' 
           : err.message);
 
       Swal.fire({

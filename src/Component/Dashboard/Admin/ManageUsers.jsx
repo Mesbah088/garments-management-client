@@ -101,7 +101,7 @@ export default function ManageUsers() {
       };
 
       const res = await api.patch(`/users/${selectedUser._id}/status`, payload);
-      if (res.data?.success) {
+      if (res.data?.success || res.data?.modifiedCount || res.data?.acknowledged || res.status === 200) {
         setIsModalOpen(false);
         Swal.fire({
           icon: 'success',

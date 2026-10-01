@@ -63,7 +63,7 @@ export default function TrackOrder() {
       };
 
       const res = await api.post(`/orders/${orderId}/tracking`, payload);
-      if (res.data?.success) {
+      if (res.data?.success || res.data?.modifiedCount || res.data?.acknowledged || res.status === 200) {
         setBuyerKnockNote('');
         Swal.fire({
           icon: 'success',
