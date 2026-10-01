@@ -174,14 +174,21 @@ const AuthProvider = ({ children }) => {
         photoURL = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80";
       }
 
-      // Sync backend token & DB data
-      const jwtRes = await api.post("/jwt", { email });
-      if (jwtRes.data?.token) {
-        localStorage.setItem("garments_access_token", jwtRes.data.token);
-      }
+      let fetchedUser = { email, name: displayName, photoURL, role: roleName, status: "approved" };
 
-      const userRes = await api.get(`/users/${email}`);
-      const fetchedUser = userRes.data;
+      // Sync backend token & DB data
+      try {
+        const jwtRes = await api.post("/jwt", { email });
+        if (jwtRes.data?.token) {
+          localStorage.setItem("garments_access_token", jwtRes.data.token);
+        }
+        const userRes = await api.get(`/users/${email}`);
+        if (userRes.data) {
+          fetchedUser = userRes.data;
+        }
+      } catch (backendErr) {
+        console.warn("Backend sync fallback for demo login:", backendErr);
+      }
 
       const mockFirebaseUser = {
         email,
@@ -189,6 +196,9 @@ const AuthProvider = ({ children }) => {
         photoURL,
         uid: `demo_${roleName}_uid`,
       };
+
+      localStorage.setItem("garments_demo_user", JSON.stringify(mockFirebaseUser));
+      localStorage.setItem("garments_demo_db_user", JSON.stringify(fetchedUser));
 
       setUser(mockFirebaseUser);
       setDbUser(fetchedUser);
@@ -205,36 +215,54 @@ const AuthProvider = ({ children }) => {
       Swal.fire({
         icon: "error",
         title: "Demo Login Failed",
-        text: err.message,
+        text: err.message || "Failed to log in",
       });
     } finally {
       setLoading(false);
     }
   };
 
-  // 🔹 Logout
+  // 🔹 Bulletproof Logout
   const logOut = async () => {
     setLoading(true);
     try {
-      await api.post("/logout", {});
+      // 1. Immediately wipe local auth storage so no stale state remains
       localStorage.removeItem("garments_access_token");
+      localStorage.removeItem("garments_demo_user");
+      localStorage.removeItem("garments_demo_db_user");
+
+      // 2. Immediately clear React user state
+      setUser(null);
+      setDbUser(null);
+
+      // 3. Sign out from Firebase Auth safely
       try {
         await signOut(auth);
       } catch (e) {
-        // demo user signOut fallback
+        // Safe fallback for demo user sessions or offline Firebase
       }
-      setUser(null);
-      setDbUser(null);
+
+      // 4. Clear server cookie session in background without blocking UI
+      api.post("/logout", {}).catch((err) => {
+        console.warn("Backend logout endpoint notice:", err?.message);
+      });
+
       Swal.fire({
         icon: "info",
         title: "Logged Out",
-        text: "You have been logged out safely.",
+        text: "You have been logged out successfully.",
         timer: 1500,
         showConfirmButton: false,
       });
     } catch (err) {
       console.error("Logout error:", err);
     } finally {
+      // Guarantee complete cleanup
+      localStorage.removeItem("garments_access_token");
+      localStorage.removeItem("garments_demo_user");
+      localStorage.removeItem("garments_demo_db_user");
+      setUser(null);
+      setDbUser(null);
       setLoading(false);
     }
   };
@@ -246,9 +274,22 @@ const AuthProvider = ({ children }) => {
         setUser(currentUser);
         await syncBackendUser(currentUser.email);
       } else {
-        // If no firebase user, check if we have a demo token session
+        // If no firebase user, check if we have an active demo session
         const storedToken = localStorage.getItem("garments_access_token");
-        if (!storedToken) {
+        const storedDemoUser = localStorage.getItem("garments_demo_user");
+        const storedDemoDbUser = localStorage.getItem("garments_demo_db_user");
+
+        if (storedToken && storedDemoUser) {
+          try {
+            setUser(JSON.parse(storedDemoUser));
+            if (storedDemoDbUser) {
+              setDbUser(JSON.parse(storedDemoDbUser));
+            }
+          } catch (e) {
+            setUser(null);
+            setDbUser(null);
+          }
+        } else {
           setUser(null);
           setDbUser(null);
         }
