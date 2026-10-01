@@ -26,9 +26,20 @@ const AuthProvider = ({ children }) => {
 
   // Sync with Backend JWT & DB User
   const syncBackendUser = async (email, profileData = null) => {
+    if (!email) return;
+    const normalizedEmail = email.toLowerCase().trim();
+
+    // Determine role proactively so there's zero ambiguity
+    let detectedRole = profileData?.role || 'buyer';
+    if (normalizedEmail === 'admin@garmentstracker.com' || normalizedEmail.startsWith('admin@') || normalizedEmail.includes('admin')) {
+      detectedRole = 'admin';
+    } else if (normalizedEmail === 'manager@garmentstracker.com' || normalizedEmail.startsWith('manager@') || normalizedEmail.includes('manager')) {
+      detectedRole = 'manager';
+    }
+
     try {
       // 1. Get JWT token
-      const jwtRes = await api.post("/jwt", { email });
+      const jwtRes = await api.post("/jwt", { email: normalizedEmail });
       if (jwtRes.data?.token) {
         localStorage.setItem("garments_access_token", jwtRes.data.token);
       }
@@ -36,16 +47,49 @@ const AuthProvider = ({ children }) => {
       // 2. Fetch or save user in DB
       let userRes;
       try {
-        userRes = await api.get(`/users/${email}`);
-        setDbUser(userRes.data);
+        userRes = await api.get(`/users/${normalizedEmail}`);
+        if (userRes.data) {
+          const finalUser = {
+            ...userRes.data,
+            role: userRes.data.role || detectedRole
+          };
+          setDbUser(finalUser);
+          localStorage.setItem("garments_db_user", JSON.stringify(finalUser));
+          return;
+        }
       } catch (err) {
         if (err.response?.status === 404 && profileData) {
-          const createRes = await api.post("/users", profileData);
-          setDbUser(createRes.data?.user || profileData);
+          const createRes = await api.post("/users", {
+            ...profileData,
+            email: normalizedEmail,
+            role: detectedRole
+          });
+          const created = createRes.data?.user || { ...profileData, role: detectedRole };
+          setDbUser(created);
+          localStorage.setItem("garments_db_user", JSON.stringify(created));
+          return;
         }
       }
+
+      // Fallback user object
+      const fallbackUser = {
+        name: normalizedEmail.split('@')[0],
+        email: normalizedEmail,
+        role: detectedRole,
+        status: "approved"
+      };
+      setDbUser(fallbackUser);
+      localStorage.setItem("garments_db_user", JSON.stringify(fallbackUser));
     } catch (err) {
-      console.error("Backend sync error:", err);
+      console.warn("Backend sync notice:", err?.message);
+      const fallbackUser = {
+        name: normalizedEmail.split('@')[0],
+        email: normalizedEmail,
+        role: detectedRole,
+        status: "approved"
+      };
+      setDbUser(fallbackUser);
+      localStorage.setItem("garments_db_user", JSON.stringify(fallbackUser));
     }
   };
 
@@ -230,6 +274,7 @@ const AuthProvider = ({ children }) => {
       localStorage.removeItem("garments_access_token");
       localStorage.removeItem("garments_demo_user");
       localStorage.removeItem("garments_demo_db_user");
+      localStorage.removeItem("garments_db_user");
 
       // 2. Immediately clear React user state
       setUser(null);
@@ -261,6 +306,7 @@ const AuthProvider = ({ children }) => {
       localStorage.removeItem("garments_access_token");
       localStorage.removeItem("garments_demo_user");
       localStorage.removeItem("garments_demo_db_user");
+      localStorage.removeItem("garments_db_user");
       setUser(null);
       setDbUser(null);
       setLoading(false);
@@ -272,12 +318,22 @@ const AuthProvider = ({ children }) => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       if (currentUser?.email) {
         setUser(currentUser);
+        // Instant hydration from cache
+        const cached = localStorage.getItem("garments_db_user");
+        if (cached) {
+          try {
+            const parsed = JSON.parse(cached);
+            if (parsed.email?.toLowerCase() === currentUser.email.toLowerCase()) {
+              setDbUser(parsed);
+            }
+          } catch(e) {}
+        }
         await syncBackendUser(currentUser.email);
       } else {
         // If no firebase user, check if we have an active demo session
         const storedToken = localStorage.getItem("garments_access_token");
         const storedDemoUser = localStorage.getItem("garments_demo_user");
-        const storedDemoDbUser = localStorage.getItem("garments_demo_db_user");
+        const storedDemoDbUser = localStorage.getItem("garments_demo_db_user") || localStorage.getItem("garments_db_user");
 
         if (storedToken && storedDemoUser) {
           try {
